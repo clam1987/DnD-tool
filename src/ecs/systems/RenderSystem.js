@@ -90,7 +90,6 @@ export class RenderSystem extends System {
 
     if (entity.interactive.prev_hover !== is_hovering) {
       current_entity.list[0].clear();
-      // console.log(current_entity.list);
 
       if (is_hovering) {
         current_entity.list[0].fillStyle(

@@ -7,4 +7,9 @@ export class Text extends Component {
     this.text = null || text;
     this.style = null || style;
   }
+
+  onChangeText(evt) {
+    const { text } = evt.data;
+    this.text = text;
+  }
 }
