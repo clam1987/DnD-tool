@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 import Phaser_config from "../../utils/configs";
 import ECS from "..";
 import World from "./World";
-import { RenderSystem, InteractiveSystem } from "../systems";
+import { RenderSystem, InteractiveSystem, RenderSystemThree } from "../systems";
 import { SceneManager, InputManager } from "../managers";
 
 export default class Game {
@@ -46,8 +46,9 @@ export default class Game {
   }
 
   initializeSystems() {
-    this.systems.set("renderSystem", new RenderSystem(this));
+    // this.systems.set("renderSystem", new RenderSystem(this));
     this.systems.set("interactiveSystem", new InteractiveSystem(this));
+    this.systems.set("renderSystem", new RenderSystemThree(this));
   }
 
   initializeManagers() {
