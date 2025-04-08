@@ -1,14 +1,10 @@
-import * as Phaser from "phaser";
-import Phaser_config from "../../utils/configs";
 import ECS from "..";
 import World from "./World";
-import { RenderSystem, InteractiveSystem, RenderSystemThree } from "../systems";
+import { RenderSystem, InteractiveSystem } from "../systems";
 import { SceneManager, InputManager } from "../managers";
 
 export default class Game {
   #last_update;
-  phaser;
-  scene;
 
   constructor(config, canvas_ref) {
     this.config = config;
@@ -16,39 +12,33 @@ export default class Game {
     this.world = new World(this);
     this.systems = new Map();
     this.managers = new Map();
-    this.initialize();
     this.initializeSystems();
     this.initializeManagers();
-    this.phaser = null;
+    this.initialize();
     this.canvas = canvas_ref.current || null;
+    this.#last_update = Date.now();
 
     window.game = this;
   }
 
   async initialize() {
     if (!this.config) return console.error("Incorrect config!");
+
     this.config.data.prefabs.forEach((prefab) => {
       this.ecs.engine.registerPrefab(prefab);
     });
 
-    const scenes = await this.loadScene();
-    this.phaser = new Phaser.Game({
-      ...Phaser_config,
-      scene: scenes,
+    const systems = await this.loadSystems();
+    systems.forEach((system) => {
+      this.systems.set(system.name, new system(this));
     });
 
-    this.phaser.events.on("ready", () => {
-      console.log("phaser is ready");
-      this.phaser.events.on("step", this.runtime, this);
-      this.managers.get("sceneManager").initialize();
-      this.managers.get("inputManager").initialize();
-    });
+    // console.log(this.managers.get("sceneManager"));
   }
 
   initializeSystems() {
-    // this.systems.set("renderSystem", new RenderSystem(this));
+    this.systems.set("renderSystem", new RenderSystem(this));
     this.systems.set("interactiveSystem", new InteractiveSystem(this));
-    this.systems.set("renderSystem", new RenderSystemThree(this));
   }
 
   initializeManagers() {
@@ -56,22 +46,28 @@ export default class Game {
     this.managers.set("inputManager", new InputManager(this));
   }
 
-  async loadScene() {
-    const scene = await Promise.all(
-      this.config.data.scenes.map(async (scene) => {
+  async loadSystems() {
+    if (this.config.data.systems.length === 0) return [];
+    const systems = await Promise.all(
+      this.config.data.systems.map(async (system) => {
         const module = await import(
-          `../../games/${this.config.name}/scene/${scene.name}`
+          `../../games/${this.game.config.name}/systems/${system.name}`
         );
 
         return module.default || module;
       })
     );
 
-    return scene;
+    return systems;
   }
 
   start() {
     this.#last_update = Date.now();
+    this.runtime = this.runtime.bind(this);
+    this.managers
+      .get("sceneManager")
+      .initialize(this.canvas, this.config.data.scenes);
+    this.runtime();
   }
 
   update(dt) {
@@ -81,13 +77,15 @@ export default class Game {
     });
   }
 
-  runtime(_, delta) {
-    this.update(delta);
-    this.#last_update = Date.now();
+  runtime() {
+    requestAnimationFrame(this.runtime);
+    const now = Date.now();
+    const dt = now - this.#last_update;
+    this.update(dt);
+    this.#last_update = now;
   }
 
   destroy() {
-    this.world.destroyWorld(this.world);
-    this.phaser.destroy(true);
+    this.world.destroyWorld();
   }
 }

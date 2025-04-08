@@ -1,13 +1,15 @@
-import { Scene } from "../../../ecs/core/Scene";
+import * as Phaser from "phaser";
 
-export default class GameScene extends Scene {
-  constructor(game) {
-    super(game);
-    this.world = game.world;
-    this.config = game.config;
+export default class GameScene extends Phaser.Scene {
+  constructor() {
+    super({ key: "GameScene" });
+    this.world = window.game.world;
+    this.config = this.world.ecs.game.config;
   }
 
-  start() {
+  preload() {}
+
+  create() {
     const { prefabs } = this.config.data.scenes.find(
       (scene) => scene.name === "GameScene"
     );

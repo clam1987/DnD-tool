@@ -22,7 +22,10 @@
             "properties": {
               "text": "Hello World!",
               "style": {
-                "fontFamily": "Georgia, 'Goudy Bookletter 1911', Times, serif"
+                "fontFamily": "/assets/fonts/Sweet_Candies_Regular.json",
+                "color": "#000000",
+                "fontSize": 2,
+                "depth": 0.1
               }
             }
           },
@@ -30,58 +33,8 @@
             "type": "Position",
             "properties": {
               "x": 0,
-              "y": 0
-            }
-          }
-        ]
-      },
-      {
-        "name": "Back_Button",
-        "components": [
-          {
-            "type": "Button"
-          },
-          {
-            "type": "Text",
-            "properties": {
-              "text": "Back to Main",
-              "style": {
-                "fontFamily": "Georgia, 'Goudy Bookletter 1911', Times, serif",
-                "fontSize": "24px",
-                "color": "0x000000"
-              }
-            }
-          },
-          {
-            "type": "Position",
-            "properties": {
-              "x": "50",
-              "y": "50"
-            }
-          },
-          {
-            "type": "Style",
-            "properties": {
-              "css": {
-                "width": "176",
-                "height": "76",
-                "backgroundColor": "0xFFFFFF",
-                "color": "0x000000"
-              },
-              "hover_style": {
-                "backgroundColor": "0xA9C7EE",
-                "color": "0x1E1E1E"
-              }
-            }
-          },
-          {
-            "type": "Interactive",
-            "properties": {
-              "action": [
-                { "type": "click", "action_type": "BACKTOMAIN" },
-                { "type": "onHover", "action_type": "ONHOVER" },
-                { "type": "offHover", "action_type": "OFFHOVER" }
-              ]
+              "y": 0,
+              "z": 0
             }
           }
         ]

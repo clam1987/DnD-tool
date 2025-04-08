@@ -12,9 +12,11 @@ const GameRender = () => {
   }, []);
 
   useEffect(() => {
-    if (!game_config) return;
+    const canvas = canvas_ref.current;
+    if (!game_config || !canvas) return;
 
     const game_cart = new Game(game_config, canvas_ref);
+    game_cart.start();
 
     return () => {
       if (game_cart) game_cart.destroy();
@@ -22,11 +24,11 @@ const GameRender = () => {
   }, [game_config]);
 
   return (
-    <div
-      id="game-container"
-      style={{ display: "block" }}
+    <canvas
       ref={canvas_ref}
-    ></div>
+      height={window.innerHeight}
+      width={window.innerWidth}
+    />
   );
 };
 

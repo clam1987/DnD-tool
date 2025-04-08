@@ -1,4 +1,4 @@
-export { RenderSystem } from "./RenderSystem";
+export { RenderSystemPhaser } from "./RenderSystem_Phaser";
 export { InteractiveSystem } from "./InteractiveSystem";
 export { SpriteLoaderSystem } from "./SpriteLoaderSystem";
-export { RenderSystemThree } from "./RenderSystemThree";
+export { RenderSystem } from "./RenderSystem";

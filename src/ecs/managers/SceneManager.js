@@ -1,34 +1,102 @@
 import Manager from "./Manager";
+import * as THREE from "three";
 
 export class SceneManager extends Manager {
   constructor(game) {
     super(game);
 
-    this.active_scene = null;
     this.current_scene = null;
+    this.renderer = null;
+    this.camera = null;
+    this.scene_manager = new Map();
   }
 
-  initialize() {
-    this.scene_manager = this.game.phaser.scene;
-    this.active_scene = this.scene_manager.getScenes(true);
-    this.setScene(this.active_scene[0].sys.config.key);
-    this.startScene(this.current_scene);
+  async initialize(canvas) {
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setClearColor(0x220000);
+    this.camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    this.camera.position.z = 5;
+
+    window.addEventListener("resize", this.onResize);
+    await this.loadScene(this.game.config.data.scenes[0]);
   }
 
-  setScene(scene) {
-    this.current_scene = scene;
-  }
+  /* might need in the future */
+  // async loadScenes() {
+  //   const scenes = await Promise.all(
+  //     this.game.config.data.scenes.map(async (scene) => {
+  //       const module = await import(
+  //         `../../games/${this.game.config.name}/scene/${scene.name}`
+  //       );
 
-  getScene(scene_name) {
-    return this.scene_manager.getScene(scene_name);
-  }
+  //       return module.default || module;
+  //     })
+  //   );
 
-  startScene(scene) {
-    if (!this.scene_manager.getScene(scene).sys.isActive()) {
-      this.scene_manager.start(scene);
-      console.log(`${scene} started!`);
+  //   console.log(scenes[0].prototype);
+
+  //   return scenes;
+  // }
+
+  async loadScene(scene) {
+    const { name } = scene;
+    if (this.scene_manager.has(name)) {
+      this.changeScene(name);
+      return;
+    }
+
+    try {
+      const scene_module = await import(
+        `../../games/${this.game.config.name}/scene/${name}`
+      );
+      const scene_instance = new scene_module.default(this.game);
+      this.scene_manager.set(name, {
+        scene: new THREE.Scene(),
+        logic: scene_instance,
+      });
+
+      this.changeScene(name);
+    } catch (err) {
+      console.error(`Error loading scene ${name}:`, err);
     }
   }
 
-  changeScene(scene) {}
+  onResize = () => {
+    if (!this.camera || !this.renderer) return;
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  };
+
+  changeScene(name) {
+    const found = this.scene_manager.get(name);
+    if (!found) {
+      console.error(`Scene ${name} not found`);
+      return;
+    }
+
+    this.current_scene = found.scene;
+
+    if (typeof found.logic.start === "function") {
+      found.logic.start();
+    }
+  }
+
+  getScene() {
+    return this.current_scene;
+  }
+
+  getCamera() {
+    return this.camera;
+  }
+
+  getRenderer() {
+    return this.renderer;
+  }
 }

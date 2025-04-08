@@ -24,65 +24,59 @@ export class InputManager extends Manager {
   }
 
   initialize() {
-    const scene_manager = this.game.managers.get("sceneManager");
-    const scene = scene_manager.getScene(scene_manager.current_scene);
-    this.keys = scene.input.keyboard.addKeys({
-      move_up: Phaser.Input.Keyboard.KeyCodes.W,
-      move_down: Phaser.Input.Keyboard.KeyCodes.S,
-      move_left: Phaser.Input.Keyboard.KeyCodes.A,
-      move_right: Phaser.Input.Keyboard.KeyCodes.D,
-      debug: Phaser.Input.Keyboard.KeyCodes.BACKTICK,
-      attack: Phaser.Input.Keyboard.KeyCodes.SPACE,
-    });
-
-    scene.input.on("pointerdown", (pointer) => {
-      this.#eventEmitter.emit("click", { x: pointer.x, y: pointer.y });
-    });
-
-    scene.input.on("pointermove", (pointer) => {
-      this.#eventEmitter.emit("hover", { x: pointer.x, y: pointer.y });
-    });
-
-    scene.input.keyboard.on("keydown", (event) => {
-      switch (event.code) {
-        case "KeyW":
-          this.keyStates.move_up = true;
-          break;
-        case "KeyS":
-          this.keyStates.move_down = true;
-          break;
-        case "KeyA":
-          this.keyStates.move_left = true;
-          break;
-        case "KeyD":
-          this.keyStates.move_right = true;
-          break;
-        default:
-          break;
-      }
-    });
-
-    scene.input.keyboard.on("keyup", (event) => {
-      switch (event.code) {
-        case "KeyW":
-          this.keyStates.move_up = false;
-          break;
-        case "KeyS":
-          this.keyStates.move_down = false;
-          break;
-        case "KeyA":
-          this.keyStates.move_left = false;
-          break;
-        case "KeyD":
-          this.keyStates.move_right = false;
-          break;
-        default:
-          break;
-      }
-
-      this.checkForStopMovement();
-    });
-
+    // const scene_manager = this.game.managers.get("sceneManager");
+    // const scene = scene_manager.getScene(scene_manager.current_scene);
+    // this.keys = scene.input.keyboard.addKeys({
+    //   move_up: Phaser.Input.Keyboard.KeyCodes.W,
+    //   move_down: Phaser.Input.Keyboard.KeyCodes.S,
+    //   move_left: Phaser.Input.Keyboard.KeyCodes.A,
+    //   move_right: Phaser.Input.Keyboard.KeyCodes.D,
+    //   debug: Phaser.Input.Keyboard.KeyCodes.BACKTICK,
+    //   attack: Phaser.Input.Keyboard.KeyCodes.SPACE,
+    // });
+    // scene.input.on("pointerdown", (pointer) => {
+    //   this.#eventEmitter.emit("click", { x: pointer.x, y: pointer.y });
+    // });
+    // scene.input.on("pointermove", (pointer) => {
+    //   this.#eventEmitter.emit("hover", { x: pointer.x, y: pointer.y });
+    // });
+    // scene.input.keyboard.on("keydown", (event) => {
+    //   switch (event.code) {
+    //     case "KeyW":
+    //       this.keyStates.move_up = true;
+    //       break;
+    //     case "KeyS":
+    //       this.keyStates.move_down = true;
+    //       break;
+    //     case "KeyA":
+    //       this.keyStates.move_left = true;
+    //       break;
+    //     case "KeyD":
+    //       this.keyStates.move_right = true;
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // });
+    // scene.input.keyboard.on("keyup", (event) => {
+    //   switch (event.code) {
+    //     case "KeyW":
+    //       this.keyStates.move_up = false;
+    //       break;
+    //     case "KeyS":
+    //       this.keyStates.move_down = false;
+    //       break;
+    //     case "KeyA":
+    //       this.keyStates.move_left = false;
+    //       break;
+    //     case "KeyD":
+    //       this.keyStates.move_right = false;
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    //   this.checkForStopMovement();
+    // });
     /* for keybinding implementation
     this.keybind = window.localStorage.getItem("keybind") || {};
     */
