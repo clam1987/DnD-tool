@@ -14,7 +14,7 @@ export class SceneManager extends Manager {
   async initialize(canvas) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setClearColor(0x220000);
+    this.renderer.setClearColor("#878787");
     this.camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
