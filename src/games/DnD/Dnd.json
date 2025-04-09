@@ -3,7 +3,7 @@
   "total_players": 6,
   "data": {
     "scenes": [
-      { "name": "GameScene", "prefabs": ["HelloWorld", "Back_Button"] }
+      { "name": "GameScene", "prefabs": ["HelloWorld", "Back_Button", "Test"] }
     ],
     "systems": [],
     "assets": {
@@ -20,11 +20,16 @@
           {
             "type": "Text",
             "properties": {
-              "text": "Hello World!",
-              "style": {
+              "text": "Game Engine DnD"
+            }
+          },
+          {
+            "type": "Style",
+            "properties": {
+              "css": {
                 "fontFamily": "/assets/fonts/Sweet_Candies_Regular.json",
-                "color": "#000000",
-                "fontSize": 2,
+                "color": "#ffffff",
+                "fontSize": 1,
                 "depth": 0.1
               }
             }
@@ -35,6 +40,104 @@
               "x": 0,
               "y": 0,
               "z": 0
+            }
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "text",
+              "layer": "ui"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Back_Button",
+        "components": [
+          {
+            "type": "Text",
+            "properties": {
+              "text": "Back"
+            }
+          },
+          {
+            "type": "Position",
+            "properties": {
+              "x": 0,
+              "y": -2,
+              "z": 0
+            }
+          },
+          {
+            "type": "Button",
+            "properties": {
+              "style": {}
+            }
+          },
+          {
+            "type": "Style",
+            "properties": {
+              "css": {
+                "backgroundColor": "#2fc5f6",
+                "fontFamily": "/assets/fonts/Sweet_Candies_Regular.json",
+                "color": "#ffffff",
+                "fontSize": 0.5,
+                "depth": 0.1
+              }
+            }
+          },
+          {
+            "type": "Size",
+            "properties": {
+              "width": 2,
+              "height": 1
+            }
+          },
+          {
+            "type": "Clickable"
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "mesh",
+              "layer": "ui"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Test",
+        "components": [
+          {
+            "type": "Text",
+            "properties": {
+              "text": "This is now working!"
+            }
+          },
+          {
+            "type": "Style",
+            "properties": {
+              "css": {
+                "fontFamily": "/assets/fonts/Sweet_Candies_Regular.json",
+                "color": "#2fa2bf",
+                "fontSize": 0.6,
+                "depth": 0.1
+              }
+            }
+          },
+          {
+            "type": "Position",
+            "properties": {
+              "x": 0,
+              "y": 2,
+              "z": 0
+            }
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "text",
+              "layer": "ui"
             }
           }
         ]

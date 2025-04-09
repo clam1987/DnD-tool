@@ -1,5 +1,5 @@
 import System from "../core/System";
-import { Text } from "../components";
+import { Renderable } from "../components";
 
 export class RenderSystem extends System {
   constructor(game) {
@@ -8,8 +8,8 @@ export class RenderSystem extends System {
     this.game = game;
     this.rendered = new Set();
     this.scene = null;
-    this.text = game.world.world.createQuery({
-      all: [Text],
+    this.renderable = game.world.world.createQuery({
+      all: [Renderable],
     })._cache;
   }
 
@@ -24,14 +24,14 @@ export class RenderSystem extends System {
       renderer.render(this.scene, camera);
     }
 
-    for (const entity of this.text) {
-      const { text, id } = entity;
-      if (!this.rendered.has(id)) {
-        entity.fireEvent("create-text");
+    for (const entity of this.renderable) {
+      const { id, renderable } = entity;
+      if (!this.rendered.has(id) && !this.renderable.updated) {
+        entity.fireEvent("create-object");
       }
 
-      if (text.mesh && !this.rendered.has(id)) {
-        this.scene.add(text.mesh);
+      if (renderable.group && !this.rendered.has(id)) {
+        this.scene.add(renderable.group);
         this.rendered.add(id);
       }
     }

@@ -1,6 +1,7 @@
-import * as Phaser from "phaser";
 import Manager from "./Manager";
-
+import EventEmitter from "events";
+import { Raycaster } from "three";
+import { Clickable } from "../components";
 export class InputManager extends Manager {
   #eventEmitter;
   constructor(game) {
@@ -17,69 +18,37 @@ export class InputManager extends Manager {
       move_left: false,
       move_right: false,
     };
-    this.#eventEmitter = new Phaser.Events.EventEmitter();
-    /* for keybinding implementation
-    this.keybind = {};
-    */
+    this.#eventEmitter = new EventEmitter();
+
+    // this.clickable = this.game.world.createQuery({
+    //   all: [Clickable],
+    // })._cache;
   }
 
-  initialize() {
-    // const scene_manager = this.game.managers.get("sceneManager");
-    // const scene = scene_manager.getScene(scene_manager.current_scene);
-    // this.keys = scene.input.keyboard.addKeys({
-    //   move_up: Phaser.Input.Keyboard.KeyCodes.W,
-    //   move_down: Phaser.Input.Keyboard.KeyCodes.S,
-    //   move_left: Phaser.Input.Keyboard.KeyCodes.A,
-    //   move_right: Phaser.Input.Keyboard.KeyCodes.D,
-    //   debug: Phaser.Input.Keyboard.KeyCodes.BACKTICK,
-    //   attack: Phaser.Input.Keyboard.KeyCodes.SPACE,
-    // });
-    // scene.input.on("pointerdown", (pointer) => {
-    //   this.#eventEmitter.emit("click", { x: pointer.x, y: pointer.y });
-    // });
-    // scene.input.on("pointermove", (pointer) => {
-    //   this.#eventEmitter.emit("hover", { x: pointer.x, y: pointer.y });
-    // });
-    // scene.input.keyboard.on("keydown", (event) => {
-    //   switch (event.code) {
-    //     case "KeyW":
-    //       this.keyStates.move_up = true;
-    //       break;
-    //     case "KeyS":
-    //       this.keyStates.move_down = true;
-    //       break;
-    //     case "KeyA":
-    //       this.keyStates.move_left = true;
-    //       break;
-    //     case "KeyD":
-    //       this.keyStates.move_right = true;
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // });
-    // scene.input.keyboard.on("keyup", (event) => {
-    //   switch (event.code) {
-    //     case "KeyW":
-    //       this.keyStates.move_up = false;
-    //       break;
-    //     case "KeyS":
-    //       this.keyStates.move_down = false;
-    //       break;
-    //     case "KeyA":
-    //       this.keyStates.move_left = false;
-    //       break;
-    //     case "KeyD":
-    //       this.keyStates.move_right = false;
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    //   this.checkForStopMovement();
-    // });
-    /* for keybinding implementation
-    this.keybind = window.localStorage.getItem("keybind") || {};
-    */
+  initialize(canvas) {
+    canvas.addEventListener("click", (evt) => {
+      const rect = canvas.getBoundingClientRect();
+
+      const mouse = {
+        x: ((evt.clientX - rect.left) / rect.width) * 2 - 1,
+        y: ((evt.clientY - rect.top) / rect.height) * 2 + 1,
+      };
+
+      const raycaster = new Raycaster();
+      const camera = this.game.managers.get("sceneManager").getCamera();
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(
+        this.game.managers.get("sceneManager").getScene().children,
+        true
+      );
+      console.log(this.game.managers.get("sceneManager").getScene().children);
+      console.log(intersects);
+      // if (intersects.length > 0) {
+      //   const { x, y, z } = intersects[0].point;
+      //   this.#eventEmitter.emit("click", { x, y, z });
+      // }
+    });
   }
 
   checkForStopMovement() {
@@ -171,10 +140,5 @@ export class InputManager extends Manager {
     this.#eventEmitter.off("hover", callback, context);
   }
 
-  destroy() {
-    const scene_manager = this.game.managers.get("sceneManager");
-    const scene = scene_manager.getScene(scene_manager.current_scene);
-    scene.input.keyboard.off("keydown", this.onKeyDown);
-    scene.input.keyboard.off("keyup", this.onKeyUp);
-  }
+  destroy() {}
 }

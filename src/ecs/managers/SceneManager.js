@@ -22,6 +22,7 @@ export class SceneManager extends Manager {
       1000
     );
     this.camera.position.z = 5;
+    // this.camera.rotation.y += Math.PI / 4;
 
     window.addEventListener("resize", this.onResize);
     await this.loadScene(this.game.config.data.scenes[0]);

@@ -28,10 +28,10 @@ export default class Game {
       this.ecs.engine.registerPrefab(prefab);
     });
 
-    const systems = await this.loadSystems();
-    systems.forEach((system) => {
-      this.systems.set(system.name, new system(this));
-    });
+    // const systems = await this.loadSystems();
+    // systems.forEach((system) => {
+    //   this.systems.set(system.name, new system(this));
+    // });
 
     // console.log(this.managers.get("sceneManager"));
   }
@@ -47,18 +47,25 @@ export default class Game {
   }
 
   async loadSystems() {
-    if (this.config.data.systems.length === 0) return [];
+    if (!this.config.data.systems || this.config.data.systems.length === 0)
+      return [];
+
     const systems = await Promise.all(
       this.config.data.systems.map(async (system) => {
-        const module = await import(
-          `../../games/${this.game.config.name}/systems/${system.name}`
-        );
+        try {
+          const module = await import(
+            `../../games/${this.game.config.name}/systems/${system.name}`
+          );
 
-        return module.default || module;
+          return module.default || module;
+        } catch (err) {
+          console.error("Error loading system:", err);
+          return null;
+        }
       })
     );
 
-    return systems;
+    return systems.filter(Boolean);
   }
 
   start() {
@@ -67,6 +74,7 @@ export default class Game {
     this.managers
       .get("sceneManager")
       .initialize(this.canvas, this.config.data.scenes);
+    this.managers.get("inputManager").initialize(this.canvas);
     this.runtime();
   }
 

@@ -5,3 +5,6 @@ export { Button } from "./Button";
 export { Interactive } from "./Interactive";
 export { Hover } from "./Hover";
 export { Style } from "./Style";
+export { Clickable } from "./Click";
+export { Renderable } from "./Renderable";
+export { Size } from "./Size";

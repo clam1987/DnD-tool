@@ -1,11 +1,6 @@
 import { Component } from "geotic";
 
-export class Button extends Component {
-  constructor({ style }) {
-    super();
-    this.style = style || null;
-  }
-
+export class Clickable extends Component {
   onClick(evt) {
     const { x, y, z } = evt.data;
     console.log(`Clicked at position: x: ${x}, y: ${y}!, z: ${z}`);
