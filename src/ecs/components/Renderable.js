@@ -16,7 +16,6 @@ export class Renderable extends Component {
     const group = new THREE.Group();
     switch (this.type) {
       case "mesh":
-        console.log("Mesh renderable type selected");
         this.displayMesh(this.entity.size, this.entity.style.css, group);
         break;
       case "sprite":

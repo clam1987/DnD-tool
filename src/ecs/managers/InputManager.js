@@ -20,9 +20,9 @@ export class InputManager extends Manager {
     };
     this.#eventEmitter = new EventEmitter();
 
-    // this.clickable = this.game.world.createQuery({
-    //   all: [Clickable],
-    // })._cache;
+    this.clickable = this.game.world.world.createQuery({
+      all: [Clickable],
+    })._cache;
   }
 
   initialize(canvas) {
@@ -31,23 +31,28 @@ export class InputManager extends Manager {
 
       const mouse = {
         x: ((evt.clientX - rect.left) / rect.width) * 2 - 1,
-        y: ((evt.clientY - rect.top) / rect.height) * 2 + 1,
+        y: -((evt.clientY - rect.top) / rect.height) * 2 + 1,
       };
 
       const raycaster = new Raycaster();
       const camera = this.game.managers.get("sceneManager").getCamera();
       raycaster.setFromCamera(mouse, camera);
 
-      const intersects = raycaster.intersectObjects(
-        this.game.managers.get("sceneManager").getScene().children,
-        true
-      );
-      console.log(this.game.managers.get("sceneManager").getScene().children);
-      console.log(intersects);
-      // if (intersects.length > 0) {
-      //   const { x, y, z } = intersects[0].point;
-      //   this.#eventEmitter.emit("click", { x, y, z });
-      // }
+      const scene = this.game.managers.get("sceneManager").getScene();
+      const intersects = raycaster.intersectObjects(scene.children, true);
+
+      if (intersects.length > 0) {
+        const intersect = intersects[0];
+        let object = intersect.object;
+        const entity = this.clickable.find(
+          (entity) => entity.renderable.group.uuid === object.parent.uuid
+        );
+        entity.fireEvent("click", {
+          x: intersect.point.x,
+          y: intersect.point.y,
+          z: intersect.point.z,
+        });
+      }
     });
   }
 

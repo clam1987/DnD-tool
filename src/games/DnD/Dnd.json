@@ -104,43 +104,6 @@
             }
           }
         ]
-      },
-      {
-        "name": "Test",
-        "components": [
-          {
-            "type": "Text",
-            "properties": {
-              "text": "This is now working!"
-            }
-          },
-          {
-            "type": "Style",
-            "properties": {
-              "css": {
-                "fontFamily": "/assets/fonts/Sweet_Candies_Regular.json",
-                "color": "#2fa2bf",
-                "fontSize": 0.6,
-                "depth": 0.1
-              }
-            }
-          },
-          {
-            "type": "Position",
-            "properties": {
-              "x": 0,
-              "y": 2,
-              "z": 0
-            }
-          },
-          {
-            "type": "Renderable",
-            "properties": {
-              "type": "text",
-              "layer": "ui"
-            }
-          }
-        ]
       }
     ]
   }

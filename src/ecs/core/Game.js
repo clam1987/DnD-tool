@@ -28,10 +28,10 @@ export default class Game {
       this.ecs.engine.registerPrefab(prefab);
     });
 
-    // const systems = await this.loadSystems();
-    // systems.forEach((system) => {
-    //   this.systems.set(system.name, new system(this));
-    // });
+    const systems = await this.loadSystems();
+    systems.forEach((system) => {
+      this.systems.set(system.name, new system(this));
+    });
 
     // console.log(this.managers.get("sceneManager"));
   }
