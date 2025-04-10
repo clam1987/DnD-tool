@@ -1,5 +1,6 @@
 import ECS from "..";
 import World from "./World";
+import { ActionRegistry } from "./ActionRegistry";
 import { RenderSystem, InteractiveSystem } from "../systems";
 import { SceneManager, InputManager } from "../managers";
 
@@ -17,6 +18,7 @@ export default class Game {
     this.initialize();
     this.canvas = canvas_ref.current || null;
     this.#last_update = Date.now();
+    this.action_registry = ActionRegistry;
 
     window.game = this;
   }
@@ -33,12 +35,13 @@ export default class Game {
       this.systems.set(system.name, new system(this));
     });
 
+    this.registerDefaultActions();
     // console.log(this.managers.get("sceneManager"));
   }
 
   initializeSystems() {
     this.systems.set("renderSystem", new RenderSystem(this));
-    this.systems.set("interactiveSystem", new InteractiveSystem(this));
+    // this.systems.set("interactiveSystem", new InteractiveSystem(this));
   }
 
   initializeManagers() {
@@ -66,6 +69,27 @@ export default class Game {
     );
 
     return systems.filter(Boolean);
+  }
+
+  registerDefaultActions() {
+    ActionRegistry.register("changeColor", (entity, payload) => {
+      const mesh = entity.renderable.group;
+      if (mesh) {
+        const current_color = mesh.material.color.getHex();
+        mesh.material.color.set(
+          current_color === "#2fc5f6" ? "#ffffff" : "#2fc5f6"
+        );
+      }
+    });
+
+    ActionRegistry.register("goToScene", (entity, payload) => {
+      this.managers.get("sceneManager").loadScene(payload.scene);
+    });
+
+    ActionRegistry.register("getMouseCoords", (entity, payload) => {
+      const { x, y, z } = payload;
+      entity.fireEvent("click", { x, y, z });
+    });
   }
 
   start() {

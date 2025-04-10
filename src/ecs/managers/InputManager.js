@@ -2,6 +2,7 @@ import Manager from "./Manager";
 import EventEmitter from "events";
 import { Raycaster } from "three";
 import { Clickable } from "../components";
+import { CLICK } from "../../utils/actions";
 export class InputManager extends Manager {
   #eventEmitter;
   constructor(game) {
@@ -47,6 +48,15 @@ export class InputManager extends Manager {
         const entity = this.clickable.find(
           (entity) => entity.renderable.group.uuid === object.parent.uuid
         );
+        this.input_stack.push({
+          type: CLICK,
+          entity,
+          payload: {
+            x: intersect.point.x,
+            y: intersect.point.y,
+            z: intersect.point.z,
+          },
+        });
         entity.fireEvent("click", {
           x: intersect.point.x,
           y: intersect.point.y,
@@ -56,93 +66,8 @@ export class InputManager extends Manager {
     });
   }
 
-  checkForStopMovement() {
-    const allKeysReleased = Object.values(this.keyStates).every(
-      (state) => !state
-    );
-    const actionSystem = this.game.systems.get("actionSystem");
-    if (actionSystem) {
-      if (allKeysReleased && !this.action_in_progress) {
-        this.#eventEmitter.emit("stopMovement");
-      }
-    }
-  }
-
-  onStopMovement(callback, context) {
-    this.#eventEmitter.on("stopMovement", callback, context);
-  }
-
-  offStopMovement(callback, context) {
-    this.#eventEmitter.off("stopMovement", callback, context);
-  }
-
-  actionComplete() {
-    this.action_in_progress = false;
-  }
-
-  actionInProgress() {
-    this.action_in_progress = true;
-  }
-
-  registerCombo(name, keys) {
-    this.combos[name] = keys;
-  }
-
-  checkCombos() {
-    for (let combo in this.combos) {
-      const keys = this.combos[combo];
-      if (keys.every((key) => this.keys[key])) {
-        return combo;
-      }
-    }
-
-    return null;
-  }
-
-  getInputs() {
-    const commands = [];
-    const allKeysReleased = Object.values(this.keyStates).every(
-      (state) => !state
-    );
-
-    if (this.keys.move_up.isDown && !this.action_in_progress) {
-      commands.push({ type: "movement", direction: "back" });
-    }
-    if (this.keys.move_down.isDown && !this.action_in_progress) {
-      commands.push({ type: "movement", direction: "front" });
-    }
-    if (this.keys.move_left.isDown && !this.action_in_progress) {
-      commands.push({ type: "movement", direction: "left" });
-    }
-    if (this.keys.move_right.isDown && !this.action_in_progress) {
-      commands.push({ type: "movement", direction: "right" });
-    }
-
-    if (this.keys.attack.isDown && allKeysReleased) {
-      commands.push({ type: "action", direction: "" });
-    }
-
-    if (this.keys.debug.isDown && allKeysReleased) {
-      commands.push({ type: "debug", direction: "" });
-    }
-
-    return commands;
-  }
-
-  onClick(callback, context) {
-    this.#eventEmitter.on("click", callback, context);
-  }
-
-  offClick(callback, context) {
-    this.#eventEmitter.off("click", callback, context);
-  }
-
-  onHover(callback, context) {
-    this.#eventEmitter.on("hover", callback, context);
-  }
-
-  offHover(callback, context) {
-    this.#eventEmitter.off("hover", callback, context);
+  getInputStack() {
+    return this.input_stack;
   }
 
   destroy() {}

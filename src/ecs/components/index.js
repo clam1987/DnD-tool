@@ -8,3 +8,4 @@ export { Style } from "./Style";
 export { Clickable } from "./Clickable";
 export { Renderable } from "./Renderable";
 export { Size } from "./Size";
+export { ActionHandler } from "./ActionHandler";
