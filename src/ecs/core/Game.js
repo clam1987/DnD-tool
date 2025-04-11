@@ -1,7 +1,7 @@
 import ECS from "..";
 import World from "./World";
 import { ActionRegistry } from "./ActionRegistry";
-import { RenderSystem, InteractiveSystem } from "../systems";
+import { RenderSystem, InteractiveSystem, InputActionSystem } from "../systems";
 import { SceneManager, InputManager } from "../managers";
 
 export default class Game {
@@ -36,12 +36,15 @@ export default class Game {
     });
 
     this.registerDefaultActions();
+    await this.registerCustomAction();
+
     // console.log(this.managers.get("sceneManager"));
   }
 
   initializeSystems() {
     this.systems.set("renderSystem", new RenderSystem(this));
     // this.systems.set("interactiveSystem", new InteractiveSystem(this));
+    this.systems.set("inputActionSystem", new InputActionSystem(this));
   }
 
   initializeManagers() {
@@ -57,7 +60,7 @@ export default class Game {
       this.config.data.systems.map(async (system) => {
         try {
           const module = await import(
-            `../../games/${this.game.config.name}/systems/${system.name}`
+            `../../games/${this.config.name}/systems/${system.name}`
           );
 
           return module.default || module;
@@ -90,6 +93,35 @@ export default class Game {
       const { x, y, z } = payload;
       entity.fireEvent("click", { x, y, z });
     });
+
+    ActionRegistry.register("backToHome", (entity, payload) => {
+      const { url } = payload;
+      window.location.href = url;
+    });
+  }
+
+  async registerCustomAction() {
+    if (
+      !this.config.data.custom_scripts ||
+      this.config.data.custom_scripts.length < 1
+    ) {
+      return [];
+    } else {
+      await Promise.all(
+        this.config.data.custom_scripts.map(async (script) => {
+          try {
+            const module = await import(
+              `../../games/${this.config.name}/scripts/${script}.js`
+            );
+
+            this.action_registry.register(script, module.default || module);
+          } catch (err) {
+            console.error("Error loading system:", err);
+            return null;
+          }
+        })
+      );
+    }
   }
 
   start() {

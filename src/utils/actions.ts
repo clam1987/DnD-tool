@@ -5,3 +5,4 @@ export const MOVE_RIGHT: string = "MOVE_RIGHT";
 export const CLICK: string = "CLICK";
 export const HOVER: string = "HOVER";
 export const DRAG: string = "DRAG";
+export const DEBUGGER: string = "DEBUGGER";

@@ -1,7 +1,9 @@
 import { Component } from "geotic";
 
 export class ActionHandler extends Component {
-  constructor() {
+  constructor({ actions }) {
     super();
+
+    this.actions = actions || null;
   }
 }

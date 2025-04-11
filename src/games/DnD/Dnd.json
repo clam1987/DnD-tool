@@ -13,6 +13,7 @@
       "sprites": [],
       "tilemaps": []
     },
+    "custom_scripts": ["changeColor"],
     "prefabs": [
       {
         "name": "HelloWorld",
@@ -94,7 +95,13 @@
             }
           },
           {
-            "type": "Clickable"
+            "type": "Interactive"
+          },
+          {
+            "type": "ActionHandler",
+            "properties": {
+              "actions": [{ "action": "backToHome", "payload": { "url": "/" } }]
+            }
           },
           {
             "type": "Renderable",

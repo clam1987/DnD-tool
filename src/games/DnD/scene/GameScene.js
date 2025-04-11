@@ -60,7 +60,15 @@ export default class GameScene extends Scene {
         },
       },
       {
-        type: "Clickable",
+        type: "ActionHandler",
+        properties: {
+          actions: [
+            { action: "changeColor", payload: { backgroundColor: "#D708F5" } },
+          ],
+        },
+      },
+      {
+        type: "Interactive",
       },
       {
         type: "Renderable",

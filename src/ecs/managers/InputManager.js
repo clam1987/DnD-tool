@@ -1,7 +1,7 @@
 import Manager from "./Manager";
 import EventEmitter from "events";
 import { Raycaster } from "three";
-import { Clickable } from "../components";
+import { Interactive } from "../components";
 import { CLICK } from "../../utils/actions";
 export class InputManager extends Manager {
   #eventEmitter;
@@ -21,8 +21,8 @@ export class InputManager extends Manager {
     };
     this.#eventEmitter = new EventEmitter();
 
-    this.clickable = this.game.world.world.createQuery({
-      all: [Clickable],
+    this.interactive = this.game.world.world.createQuery({
+      all: [Interactive],
     })._cache;
   }
 
@@ -45,23 +45,20 @@ export class InputManager extends Manager {
       if (intersects.length > 0) {
         const intersect = intersects[0];
         let object = intersect.object;
-        const entity = this.clickable.find(
+        const entity = this.interactive.find(
           (entity) => entity.renderable.group.uuid === object.parent.uuid
         );
-        this.input_stack.push({
-          type: CLICK,
-          entity,
-          payload: {
-            x: intersect.point.x,
-            y: intersect.point.y,
-            z: intersect.point.z,
-          },
-        });
-        entity.fireEvent("click", {
-          x: intersect.point.x,
-          y: intersect.point.y,
-          z: intersect.point.z,
-        });
+        if (entity.actionHandler) {
+          const { actions } = entity?.actionHandler;
+          actions.forEach(({ action, payload }) => {
+            this.input_stack.push({
+              type: CLICK,
+              entity,
+              payload,
+              action,
+            });
+          });
+        }
       }
     });
   }
@@ -70,5 +67,11 @@ export class InputManager extends Manager {
     return this.input_stack;
   }
 
-  destroy() {}
+  clearInputStack() {
+    this.input_stack = [];
+  }
+
+  destroy(canvas) {
+    canvas.removeEventListener("click");
+  }
 }
