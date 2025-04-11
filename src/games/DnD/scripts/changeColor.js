@@ -17,7 +17,6 @@ export default function changeColor(entity, payload) {
     const current_text_color = text_mesh.material.color.getHexString();
     backgroundColor = backgroundColor || current_background_color;
     color = color || current_text_color;
-    console.log(current_text_color, current_background_color);
     button_mesh.material.color.set(
       current_background_color === "2fc5f6" ? backgroundColor : "#2fc5f6"
     );
