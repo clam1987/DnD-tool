@@ -1,7 +1,13 @@
 import { Raycaster } from "three";
 import System from "../core/System";
-import { ActionHandler, Hover, Interactive, Renderable } from "../components";
-import { CLICK, MOUSEENTER, MOUSELEAVE } from "../../utils/actions";
+import {
+  ActionHandler,
+  Hover,
+  Interactive,
+  Renderable,
+  Drag,
+} from "../components";
+import { CLICK, DRAG, DROP, MOUSEENTER, MOUSELEAVE } from "../../utils/actions";
 
 export class InteractiveActionSystem extends System {
   constructor(game) {
@@ -9,6 +15,7 @@ export class InteractiveActionSystem extends System {
 
     this.raycaster = new Raycaster();
     this.hovered_entity = null;
+    this.dragged_entity = null;
     this.game = game;
     this.input_manager = null;
     this.action_handler = game.world.world.createQuery({
@@ -19,6 +26,9 @@ export class InteractiveActionSystem extends System {
     })._cache;
     this.interactive = game.world.world.createQuery({
       all: [Interactive],
+    })._cache;
+    this.drag = game.world.world.createQuery({
+      all: [Drag],
     })._cache;
   }
 
@@ -62,6 +72,47 @@ export class InteractiveActionSystem extends System {
       this.hovered_entity = null;
     }
     document.body.style.cursor = "default";
+  }
+
+  #handleDrag(dt) {
+    if (this.input_manager) {
+      const mouse = this.input_manager.getMouse();
+      const click_input = this.input_manager.findInput(CLICK);
+      const release_input = this.input_manager.findInput(DROP);
+      const drag_input = this.input_manager.findInput(DRAG);
+
+      if (!drag_input) return;
+
+      const now = performance.now();
+      const click_age = now - drag_input.timestamp;
+
+      if (click_age > 100) {
+        this.input_manager.popInputStack();
+      }
+
+      const entity = this.hovered_entity;
+      if (entity && entity.has(Drag)) {
+        if (!entity.has(Drag)) {
+          console.log("no drag component");
+          entity.add(Drag);
+          entity.fireEvent("drag-start", { mouse });
+        } else {
+          entity.fireEvent("dragging", { mouse, dt });
+        }
+      }
+
+      // console.log(!this.dragged_entity);
+      // console.log(click_input);
+      // console.log(this.hovered_entity?.has(Interactive));
+
+      // if (
+      //   !this.dragged_entity &&
+      //   click_input &&
+      //   this.hovered_entity?.has(Interactive)
+      // ) {
+      //   console.log("Begin dragging");
+      // }
+    }
   }
 
   #handleClick(entity, context) {
@@ -134,10 +185,11 @@ export class InteractiveActionSystem extends System {
     }
 
     // Optional: Clear remaining stale inputs
-    this.input_manager.clearInputStack();
+    // this.input_manager.clearInputStack();
   }
 
   update(dt) {
     this.#handleInputs();
+    this.#handleDrag(dt);
   }
 }

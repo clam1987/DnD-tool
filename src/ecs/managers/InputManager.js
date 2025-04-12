@@ -1,7 +1,7 @@
 import Manager from "./Manager";
 import EventEmitter from "events";
 import { Interactive } from "../components";
-import { CLICK } from "../../utils/actions";
+import { CLICK, DRAG, DROP } from "../../utils/actions";
 export class InputManager extends Manager {
   #eventEmitter;
   constructor(game) {
@@ -39,6 +39,22 @@ export class InputManager extends Manager {
     canvas.addEventListener("click", (evt) => {
       this.input_stack.push({
         type: CLICK,
+        mouse: this.mouse,
+        timestamp: performance.now(),
+      });
+    });
+
+    canvas.addEventListener("mousedown", (evt) => {
+      this.input_stack.push({
+        type: DRAG,
+        mouse: this.mouse,
+        timestamp: performance.now(),
+      });
+    });
+
+    canvas.addEventListener("mouseup", (evt) => {
+      this.input_stack.push({
+        type: DROP,
         mouse: this.mouse,
         timestamp: performance.now(),
       });

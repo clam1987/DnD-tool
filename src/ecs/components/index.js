@@ -9,3 +9,4 @@ export { Clickable } from "./Clickable";
 export { Renderable } from "./Renderable";
 export { Size } from "./Size";
 export { ActionHandler } from "./ActionHandler";
+export { Drag } from "./Drag";

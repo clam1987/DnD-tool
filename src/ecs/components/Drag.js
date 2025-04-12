@@ -15,11 +15,20 @@ export class Drag extends Component {
     this.start.z = this.entity.position.z;
   }
 
-  onDragStart() {
+  onDragStart(evt) {
     this.active = true;
+
+    evt.handle();
   }
 
-  onDragEnd() {
+  onDragging(evt) {
+    const { mouse, dt } = evt.data;
+    evt.handle();
+  }
+
+  onDragEnd(evt) {
     this.active = false;
+
+    evt.handle();
   }
 }
