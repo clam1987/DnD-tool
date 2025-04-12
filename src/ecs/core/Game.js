@@ -1,7 +1,7 @@
 import ECS from "..";
 import World from "./World";
 import { ActionRegistry } from "./ActionRegistry";
-import { RenderSystem, InteractiveSystem, InputActionSystem } from "../systems";
+import { RenderSystem, InteractiveActionSystem } from "../systems";
 import { SceneManager, InputManager } from "../managers";
 
 export default class Game {
@@ -43,8 +43,10 @@ export default class Game {
 
   initializeSystems() {
     this.systems.set("renderSystem", new RenderSystem(this));
-    // this.systems.set("interactiveSystem", new InteractiveSystem(this));
-    this.systems.set("inputActionSystem", new InputActionSystem(this));
+    this.systems.set(
+      "interactiveActionSystem",
+      new InteractiveActionSystem(this)
+    );
   }
 
   initializeManagers() {
@@ -90,11 +92,11 @@ export default class Game {
     });
 
     ActionRegistry.register("getMouseCoords", (entity, payload) => {
-      const { x, y, z } = payload;
-      entity.fireEvent("click", { x, y, z });
+      const { x, y } = payload;
+      console.log(`Mouse Coords: ${x}, ${y}`);
     });
 
-    ActionRegistry.register("backToHome", (entity, payload) => {
+    ActionRegistry.register("changeURL", (entity, payload) => {
       const { url } = payload;
       window.location.href = url;
     });

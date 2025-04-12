@@ -3,7 +3,11 @@
   "total_players": 6,
   "data": {
     "scenes": [
-      { "name": "GameScene", "prefabs": ["HelloWorld", "Back_Button", "Test"] }
+      {
+        "name": "GameScene",
+        "prefabs": ["HelloWorld", "Back_Button", "Test"],
+        "systems": []
+      }
     ],
     "systems": [],
     "assets": {
@@ -100,7 +104,29 @@
           {
             "type": "ActionHandler",
             "properties": {
-              "actions": [{ "action": "backToHome", "payload": { "url": "/" } }]
+              "actions": [
+                {
+                  "action": "changeURL",
+                  "payload": { "url": "/" },
+                  "type": "CLICK"
+                },
+                {
+                  "action": "changeColor",
+                  "payload": {
+                    "color": "#F0F6FC",
+                    "backgroundColor": "#80A0FA"
+                  },
+                  "type": "MOUSEENTER"
+                },
+                {
+                  "action": "changeColor",
+                  "payload": {
+                    "color": "#FFFFFF",
+                    "backgroundColor": "#2FC5F6"
+                  },
+                  "type": "MOUSELEAVE"
+                }
+              ]
             }
           },
           {

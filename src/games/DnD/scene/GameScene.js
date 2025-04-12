@@ -3,6 +3,8 @@ import { Scene } from "../../../ecs/core/Scene";
 export default class GameScene extends Scene {
   constructor(game) {
     super(game);
+
+    this.game = game;
     this.world = game.world;
     this.config = game.config;
   }
@@ -18,6 +20,8 @@ export default class GameScene extends Scene {
         this.world.createEntity(name, components);
       }
     });
+
+    const { x, y } = this.game.managers.get("inputManager").getMouse();
 
     const components = [
       {
@@ -63,7 +67,21 @@ export default class GameScene extends Scene {
         type: "ActionHandler",
         properties: {
           actions: [
-            { action: "changeColor", payload: { backgroundColor: "#D708F5" } },
+            {
+              action: "changeColor",
+              payload: { backgroundColor: "#D708F5" },
+              type: "MOUSEENTER",
+            },
+            {
+              action: "getMouseCoords",
+              payload: { x: "$mouse.x", y: "$mouse.y" },
+              type: "CLICK",
+            },
+            {
+              action: "changeColor",
+              payload: { backgroundColor: "#2fc5f6" },
+              type: "MOUSELEAVE",
+            },
           ],
         },
       },
