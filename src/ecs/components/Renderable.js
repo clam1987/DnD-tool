@@ -2,6 +2,7 @@ import { Component } from "geotic";
 import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
+// import Text from "troika-three-text";
 
 export class Renderable extends Component {
   constructor({ type, layer }) {
@@ -42,11 +43,7 @@ export class Renderable extends Component {
       color: style.backgroundColor,
     });
     const box_mesh = new THREE.Mesh(geometry, material);
-    box_mesh.position.set(
-      this.entity.position.x,
-      this.entity.position.y,
-      this.entity.position.z
-    );
+    box_mesh.position.copy(this.entity.position.coords);
     group.add(box_mesh);
 
     if (this.entity.text) {
@@ -88,11 +85,10 @@ export class Renderable extends Component {
         text_mesh.position.set(0, 0, 0);
       }
 
-      text_mesh.position.set(
-        this.entity.position.x,
-        this.entity.position.y,
-        this.entity.position.z + 0.06
-      );
+      text_mesh.position.copy({
+        ...this.entity.position.coords,
+        z: this.entity.position.coords.z + 0.06,
+      });
 
       parent_group.add(text_mesh);
     });

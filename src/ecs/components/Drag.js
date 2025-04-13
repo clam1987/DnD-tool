@@ -1,28 +1,27 @@
 import { Component } from "geotic";
+import { Vector3 } from "three";
 
 export class Drag extends Component {
   constructor() {
     super();
 
-    this.start = { x: 0, y: 0, z: 0 };
-    this.current = { x: 0, y: 0, z: 0 };
     this.active = false;
+    this.offset = new Vector3();
   }
 
   onAttached() {
-    this.start.x = this.entity.position.x;
-    this.start.y = this.entity.position.y;
-    this.start.z = this.entity.position.z;
+    if (this.entity?.position) {
+      const { x, y, z } = this.entity.position;
+      this.start = new Vector3(x, y, z);
+    }
   }
 
   onDragStart(evt) {
+    console.log("Drag Start!");
+    const { offset } = evt.data;
     this.active = true;
+    this.offset.copy(offset);
 
-    evt.handle();
-  }
-
-  onDragging(evt) {
-    const { mouse, dt } = evt.data;
     evt.handle();
   }
 

@@ -1,5 +1,6 @@
-import Manager from "./Manager";
 import EventEmitter from "events";
+import { Vector3 } from "three";
+import Manager from "./Manager";
 import { Interactive } from "../components";
 import { CLICK, DRAG, DROP } from "../../utils/actions";
 export class InputManager extends Manager {
@@ -14,6 +15,9 @@ export class InputManager extends Manager {
     this.mouse = {
       x: 0,
       y: 0,
+      left_clicked: false,
+      right_clicked: false,
+      middle_clicked: false,
     };
 
     this.keyStates = {
@@ -41,6 +45,7 @@ export class InputManager extends Manager {
         type: CLICK,
         mouse: this.mouse,
         timestamp: performance.now(),
+        evt,
       });
     });
 
@@ -49,7 +54,18 @@ export class InputManager extends Manager {
         type: DRAG,
         mouse: this.mouse,
         timestamp: performance.now(),
+        evt,
       });
+
+      if (evt.button === 0) {
+        this.mouse.left_clicked = true;
+      }
+      if (evt.button === 1) {
+        this.mouse.middle_clicked = true;
+      }
+      if (evt.button === 2) {
+        this.mouse.right_clicked = true;
+      }
     });
 
     canvas.addEventListener("mouseup", (evt) => {
@@ -57,12 +73,27 @@ export class InputManager extends Manager {
         type: DROP,
         mouse: this.mouse,
         timestamp: performance.now(),
+        evt,
       });
+
+      if (evt.button === 0) {
+        this.mouse.left_clicked = false;
+      }
+      if (evt.button === 1) {
+        this.mouse.middle_clicked = false;
+      }
+      if (evt.button === 2) {
+        this.mouse.right_clicked = false;
+      }
     });
   }
 
   getMouse() {
     return this.mouse;
+  }
+
+  getMouseInWorld(camera) {
+    return new Vector3(this.mouse.x, this.mouse.y, 0.5).unproject(camera);
   }
 
   getInputStack() {
@@ -83,6 +114,15 @@ export class InputManager extends Manager {
 
   findInput(type) {
     return this.input_stack.find((input) => input.type === type);
+  }
+
+  mouseDown() {
+    return this.input_stack.find(
+      (input) =>
+        input.evt.button === 0 ||
+        input.evt.button === 1 ||
+        input.evt.button === 2
+    );
   }
 
   useInputType(input) {

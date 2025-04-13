@@ -34,7 +34,7 @@ export default class GameScene extends Scene {
         type: "Position",
         properties: {
           x: 0,
-          y: 2,
+          y: 1,
           z: 0,
         },
       },
@@ -81,6 +81,16 @@ export default class GameScene extends Scene {
               action: "changeColor",
               payload: { backgroundColor: "#2fc5f6" },
               type: "MOUSELEAVE",
+            },
+            {
+              action: "moveEntity",
+              payload: { x: "$mouse.x", y: "$mouse.y" },
+              type: "DRAG",
+            },
+            {
+              action: "dragEnd",
+              payload: { x: "$mouse.x", y: "$mouse.y" },
+              type: "DROP",
             },
           ],
         },

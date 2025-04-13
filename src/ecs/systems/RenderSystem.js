@@ -25,7 +25,7 @@ export class RenderSystem extends System {
     }
 
     for (const entity of this.renderable) {
-      const { id, renderable } = entity;
+      const { id, renderable, position } = entity;
       if (!this.rendered.has(id) && !this.renderable.updated) {
         entity.fireEvent("create-object");
       }
@@ -33,6 +33,10 @@ export class RenderSystem extends System {
       if (renderable.group && !this.rendered.has(id)) {
         this.scene.add(renderable.group);
         this.rendered.add(id);
+      }
+
+      if (!renderable.group.position.equals(position.coords)) {
+        renderable.group.position.copy(position.coords);
       }
     }
   }

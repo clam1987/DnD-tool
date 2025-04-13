@@ -1,4 +1,4 @@
-import { Raycaster } from "three";
+import { Raycaster, Vector3, Plane } from "three";
 import System from "../core/System";
 import {
   ActionHandler,
@@ -6,6 +6,7 @@ import {
   Interactive,
   Renderable,
   Drag,
+  Position,
 } from "../components";
 import { CLICK, DRAG, DROP, MOUSEENTER, MOUSELEAVE } from "../../utils/actions";
 
@@ -16,8 +17,10 @@ export class InteractiveActionSystem extends System {
     this.raycaster = new Raycaster();
     this.hovered_entity = null;
     this.dragged_entity = null;
+    this.drag_plane = null;
     this.game = game;
     this.input_manager = null;
+    this.did_drag = false;
     this.action_handler = game.world.world.createQuery({
       all: [ActionHandler],
     })._cache;
@@ -33,6 +36,7 @@ export class InteractiveActionSystem extends System {
   }
 
   #processEntityAction(entity, trigger_type, context) {
+    console.log(trigger_type);
     const actions = entity.actionHandler?.actions ?? [];
     for (const { action, payload, type } of actions) {
       if (trigger_type === type && this.game.action_registry.has(action)) {
@@ -75,54 +79,76 @@ export class InteractiveActionSystem extends System {
   }
 
   #handleDrag(dt) {
-    if (this.input_manager) {
-      const mouse = this.input_manager.getMouse();
-      const click_input = this.input_manager.findInput(CLICK);
-      const release_input = this.input_manager.findInput(DROP);
-      const drag_input = this.input_manager.findInput(DRAG);
+    if (!this.input_manager) return;
 
-      if (!drag_input) return;
+    const camera = this.#getManager("sceneManager").getCamera();
+    if (!camera) return;
 
-      const now = performance.now();
-      const click_age = now - drag_input.timestamp;
+    const mouse_ndc = this.input_manager.getMouse(); // normalized device coords
+    this.raycaster.setFromCamera(mouse_ndc, camera);
+    const ray = this.raycaster.ray;
 
-      if (click_age > 100) {
-        this.input_manager.popInputStack();
-      }
+    const left_click_down = this.input_manager.mouseDown()?.mouse.left_clicked;
 
+    // 🟢 Start Drag
+    if (left_click_down && !this.dragged_entity) {
       const entity = this.hovered_entity;
-      if (entity && entity.has(Drag)) {
-        if (!entity.has(Drag)) {
-          console.log("no drag component");
-          entity.add(Drag);
-          entity.fireEvent("drag-start", { mouse });
-        } else {
-          entity.fireEvent("dragging", { mouse, dt });
-        }
+      if (entity && entity.has(Position)) {
+        const entity_pos = entity.position.coords.clone();
+
+        // Create a plane perpendicular to camera direction passing through entity position
+        const normal = camera.getWorldDirection(new Vector3()).normalize();
+        const constant = -normal.dot(entity_pos);
+        this.drag_plane = new Plane(normal, constant);
+
+        // Project mouse ray to plane and calculate offset
+        const intersection_point = new Vector3();
+        ray.intersectPlane(this.drag_plane, intersection_point);
+
+        const offset = new Vector3().subVectors(entity_pos, intersection_point);
+
+        entity.add(Drag);
+        entity.fireEvent("drag-start", { mouse: intersection_point, offset });
+        this.dragged_entity = entity;
+        document.body.style.cursor = "grabbing";
       }
+    }
 
-      // console.log(!this.dragged_entity);
-      // console.log(click_input);
-      // console.log(this.hovered_entity?.has(Interactive));
+    // 🔁 Continue Drag
+    if (this.dragged_entity?.drag?.active && left_click_down) {
+      const drag = this.dragged_entity.drag;
+      const point = new Vector3();
+      ray.intersectPlane(this.drag_plane, point);
 
-      // if (
-      //   !this.dragged_entity &&
-      //   click_input &&
-      //   this.hovered_entity?.has(Interactive)
-      // ) {
-      //   console.log("Begin dragging");
-      // }
+      if (point) {
+        const new_pos = new Vector3().copy(point).add(drag.offset);
+        this.dragged_entity.fireEvent("move-position", { mouse: new_pos });
+        this.did_drag = true;
+      }
+    }
+
+    // 🔴 End Drag
+    if (this.dragged_entity && !left_click_down) {
+      this.dragged_entity.fireEvent("drag-end");
+      this.dragged_entity.remove(this.dragged_entity.drag);
+      this.dragged_entity = null;
+      this.drag_plane = null;
+      document.body.style.cursor = "default";
     }
   }
 
   #handleClick(entity, context) {
-    const clickInput = this.input_manager.findInput(CLICK);
-    if (clickInput) {
+    if (this.did_drag) {
+      this.did_drag = false;
+      return;
+    }
+    const click_input = this.input_manager.findInput(CLICK);
+    if (click_input) {
       const now = performance.now();
-      if (now - clickInput.timestamp < 100) {
-        this.#processEntityAction(entity, CLICK, context);
+      if (now - click_input.timestamp < 150) {
+        this.#processEntityAction(entity, click_input.type, context);
       }
-      this.input_manager.popInputStack(); // Always pop stale or fresh input
+      this.input_manager.useInputType(click_input); // Always pop stale or fresh input
     }
   }
 
@@ -145,7 +171,7 @@ export class InteractiveActionSystem extends System {
     return resolved;
   }
 
-  #handleInputs() {
+  #handleInputs(dt) {
     if (!this.input_manager) {
       this.input_manager = this.#getManager("inputManager");
       return;
@@ -155,6 +181,7 @@ export class InteractiveActionSystem extends System {
     const mouse = this.input_manager.getMouse();
     const camera = scene_manager.getCamera();
     const scene = scene_manager.getScene();
+    const left_click_down = this.input_manager.mouseDown()?.mouse.left_clicked;
 
     if (!scene || !camera || !mouse) return;
 
@@ -179,6 +206,10 @@ export class InteractiveActionSystem extends System {
       this.#handleHover(hit_entity, context);
       if (hit_entity.has(ActionHandler)) {
         this.#handleClick(hit_entity, context);
+        if (left_click_down) {
+          this.#handleDrag(dt);
+        }
+        // this.#clearDrag(dt);
       }
     } else {
       this.#clearHover(context);
@@ -189,7 +220,17 @@ export class InteractiveActionSystem extends System {
   }
 
   update(dt) {
-    this.#handleInputs();
-    this.#handleDrag(dt);
+    this.did_drag = false;
+    this.#handleInputs(dt);
+
+    if (
+      this.dragged_entity &&
+      !this.input_manager.mouseDown()?.mouse.left_clicked
+    ) {
+      this.dragged_entity.fireEvent("drag-end");
+      this.dragged_entity.remove(this.dragged_entity.drag);
+      this.dragged_entity = null;
+      document.body.style.cursor = "default";
+    }
   }
 }

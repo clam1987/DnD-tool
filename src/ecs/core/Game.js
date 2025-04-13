@@ -1,6 +1,6 @@
 import ECS from "..";
 import World from "./World";
-import { ActionRegistry } from "./ActionRegistry";
+import { ActionRegistry, registerDefaultActions } from "./ActionRegistry";
 import { RenderSystem, InteractiveActionSystem } from "../systems";
 import { SceneManager, InputManager } from "../managers";
 
@@ -35,10 +35,8 @@ export default class Game {
       this.systems.set(system.name, new system(this));
     });
 
-    this.registerDefaultActions();
-    await this.registerCustomAction();
-
-    // console.log(this.managers.get("sceneManager"));
+    registerDefaultActions();
+    await this.#registerCustomAction();
   }
 
   initializeSystems() {
@@ -76,33 +74,7 @@ export default class Game {
     return systems.filter(Boolean);
   }
 
-  registerDefaultActions() {
-    ActionRegistry.register("changeColor", (entity, payload) => {
-      const mesh = entity.renderable.group;
-      if (mesh) {
-        const current_color = mesh.material.color.getHex();
-        mesh.material.color.set(
-          current_color === "#2fc5f6" ? "#ffffff" : "#2fc5f6"
-        );
-      }
-    });
-
-    ActionRegistry.register("goToScene", (entity, payload) => {
-      this.managers.get("sceneManager").loadScene(payload.scene);
-    });
-
-    ActionRegistry.register("getMouseCoords", (entity, payload) => {
-      const { x, y } = payload;
-      console.log(`Mouse Coords: ${x}, ${y}`);
-    });
-
-    ActionRegistry.register("changeURL", (entity, payload) => {
-      const { url } = payload;
-      window.location.href = url;
-    });
-  }
-
-  async registerCustomAction() {
+  async #registerCustomAction() {
     if (
       !this.config.data.custom_scripts ||
       this.config.data.custom_scripts.length < 1
