@@ -1,4 +1,4 @@
-import { Raycaster, Vector3, Plane } from "three";
+import { Raycaster, Vector3, Vector2, Plane } from "three";
 import System from "../core/System";
 import {
   ActionHandler,
@@ -8,19 +8,22 @@ import {
   Drag,
   Position,
 } from "../components";
-import { CLICK, DRAG, DROP, MOUSEENTER, MOUSELEAVE } from "../../utils/actions";
+import { CLICK, MOUSEENTER, MOUSELEAVE } from "../../utils/actions";
 
 export class InteractiveActionSystem extends System {
   constructor(game) {
     super(game);
 
+    this.drag_plane = new Plane(new Vector3(0, 0, 1), 0); // z = 0
+    this.drag_intersection = new Vector3();
+    this.mouse_ndc = new Vector2();
+    this.suppress_next_click = false;
     this.raycaster = new Raycaster();
     this.hovered_entity = null;
     this.dragged_entity = null;
-    this.drag_plane = null;
+    this.drag_end_dt = null;
     this.game = game;
     this.input_manager = null;
-    this.did_drag = false;
     this.action_handler = game.world.world.createQuery({
       all: [ActionHandler],
     })._cache;
@@ -36,7 +39,6 @@ export class InteractiveActionSystem extends System {
   }
 
   #processEntityAction(entity, trigger_type, context) {
-    console.log(trigger_type);
     const actions = entity.actionHandler?.actions ?? [];
     for (const { action, payload, type } of actions) {
       if (trigger_type === type && this.game.action_registry.has(action)) {
@@ -84,71 +86,115 @@ export class InteractiveActionSystem extends System {
     const camera = this.#getManager("sceneManager").getCamera();
     if (!camera) return;
 
-    const mouse_ndc = this.input_manager.getMouse(); // normalized device coords
+    const mouse_ndc = this.input_manager.getMouse(); // Vector2 [-1, 1]
     this.raycaster.setFromCamera(mouse_ndc, camera);
     const ray = this.raycaster.ray;
 
-    const left_click_down = this.input_manager.mouseDown()?.mouse.left_clicked;
+    const left_down = this.input_manager.mouseDown();
 
-    // 🟢 Start Drag
-    if (left_click_down && !this.dragged_entity) {
+    // 🟢 Drag Start
+    if (
+      left_down?.key === "left_clicked" &&
+      left_down?.value &&
+      !this.dragged_entity
+    ) {
       const entity = this.hovered_entity;
       if (entity && entity.has(Position)) {
-        const entity_pos = entity.position.coords.clone();
+        const z_plane = entity.position.coords.z;
+        const plane = new Plane(new Vector3(0, 0, 1), -z_plane); // z = plane
 
-        // Create a plane perpendicular to camera direction passing through entity position
-        const normal = camera.getWorldDirection(new Vector3()).normalize();
-        const constant = -normal.dot(entity_pos);
-        this.drag_plane = new Plane(normal, constant);
+        const intersection = new Vector3();
+        ray.intersectPlane(plane, intersection);
 
-        // Project mouse ray to plane and calculate offset
-        const intersection_point = new Vector3();
-        ray.intersectPlane(this.drag_plane, intersection_point);
+        const offset = new Vector3().subVectors(
+          entity.position.coords,
+          intersection
+        );
 
-        const offset = new Vector3().subVectors(entity_pos, intersection_point);
+        entity.add(Drag, {
+          offset,
+          target_position: entity.position.coords.clone(),
+          last_mouse: intersection.clone(),
+          plane_z: z_plane,
+          start_time: performance.now(),
+          active: true,
+        });
 
-        entity.add(Drag);
-        entity.fireEvent("drag-start", { mouse: intersection_point, offset });
-        this.dragged_entity = entity;
         document.body.style.cursor = "grabbing";
+        entity.fireEvent("drag-start", {
+          mouse: intersection.clone(),
+          offset: offset.clone(),
+        });
+
+        this.dragged_entity = entity;
       }
     }
 
-    // 🔁 Continue Drag
-    if (this.dragged_entity?.drag?.active && left_click_down) {
+    // 🟡 During Drag
+    if (this.dragged_entity?.drag?.active && left_down) {
       const drag = this.dragged_entity.drag;
-      const point = new Vector3();
-      ray.intersectPlane(this.drag_plane, point);
+      const plane = new Plane(new Vector3(0, 0, 1), -drag.plane_z);
+      const intersection = new Vector3();
 
-      if (point) {
-        const new_pos = new Vector3().copy(point).add(drag.offset);
-        this.dragged_entity.fireEvent("move-position", { mouse: new_pos });
-        this.did_drag = true;
+      if (ray.intersectPlane(plane, intersection)) {
+        const target_position = new Vector3()
+          .copy(intersection)
+          .add(drag.offset);
+        drag.target_position.copy(target_position);
+        drag.last_mouse.copy(intersection);
       }
     }
 
-    // 🔴 End Drag
-    if (this.dragged_entity && !left_click_down) {
+    // 🟥 Drag End
+    if (this.dragged_entity && !left_down?.value) {
+      const drag = this.dragged_entity.drag;
+
+      const duration = performance.now() - drag.start_time;
+
+      const long_enough = duration > 150;
+
+      if (long_enough) {
+        this.suppress_next_click = true;
+      }
+
       this.dragged_entity.fireEvent("drag-end");
       this.dragged_entity.remove(this.dragged_entity.drag);
       this.dragged_entity = null;
-      this.drag_plane = null;
       document.body.style.cursor = "default";
     }
   }
 
-  #handleClick(entity, context) {
-    if (this.did_drag) {
-      this.did_drag = false;
-      return;
+  #interpolateDrag(dt) {
+    for (const entity of this.drag) {
+      if (!entity.has(Position)) continue;
+
+      const drag = entity.drag;
+      const pos = entity.position.coords;
+      const target = drag.target_position;
+
+      const lerp_factor = Math.min(1.0, dt * 20);
+
+      pos.lerp(target, lerp_factor);
+
+      entity.fireEvent("move-position", { mouse: pos.clone() });
     }
+  }
+
+  #handleClick(entity, context) {
     const click_input = this.input_manager.findInput(CLICK);
     if (click_input) {
       const now = performance.now();
+      if (this.suppress_next_click) {
+        this.suppress_next_click = false;
+        this.input_manager.useInputType(click_input);
+        return;
+      }
+
       if (now - click_input.timestamp < 150) {
         this.#processEntityAction(entity, click_input.type, context);
       }
-      this.input_manager.useInputType(click_input); // Always pop stale or fresh input
+
+      this.input_manager.useInputType(click_input);
     }
   }
 
@@ -181,7 +227,6 @@ export class InteractiveActionSystem extends System {
     const mouse = this.input_manager.getMouse();
     const camera = scene_manager.getCamera();
     const scene = scene_manager.getScene();
-    const left_click_down = this.input_manager.mouseDown()?.mouse.left_clicked;
 
     if (!scene || !camera || !mouse) return;
 
@@ -205,28 +250,25 @@ export class InteractiveActionSystem extends System {
       context.entity = hit_entity;
       this.#handleHover(hit_entity, context);
       if (hit_entity.has(ActionHandler)) {
+        this.#handleDrag(dt);
+
         this.#handleClick(hit_entity, context);
-        if (left_click_down) {
-          this.#handleDrag(dt);
-        }
-        // this.#clearDrag(dt);
       }
     } else {
       this.#clearHover(context);
     }
-
-    // Optional: Clear remaining stale inputs
-    // this.input_manager.clearInputStack();
   }
 
   update(dt) {
-    this.did_drag = false;
     this.#handleInputs(dt);
+    this.#interpolateDrag(dt);
 
-    if (
-      this.dragged_entity &&
-      !this.input_manager.mouseDown()?.mouse.left_clicked
-    ) {
+    if (this.dragged_entity && !this.input_manager.mouseDown()?.value) {
+      const drag = this.dragged_entity.drag;
+      const duration = performance.now() - drag.start_time;
+      if (duration > 150) {
+        this._suppress_next_click = true;
+      }
       this.dragged_entity.fireEvent("drag-end");
       this.dragged_entity.remove(this.dragged_entity.drag);
       this.dragged_entity = null;

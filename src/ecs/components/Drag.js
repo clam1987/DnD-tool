@@ -2,11 +2,22 @@ import { Component } from "geotic";
 import { Vector3 } from "three";
 
 export class Drag extends Component {
-  constructor() {
+  constructor({
+    offset,
+    target_position,
+    last_mouse,
+    start_time,
+    plane_z,
+    active,
+  }) {
     super();
 
-    this.active = false;
-    this.offset = new Vector3();
+    this.offset = offset ?? new Vector3();
+    this.target_position = target_position ?? null;
+    this.last_mouse = last_mouse ?? null;
+    this.plane_z = plane_z ?? null;
+    this.start_time = start_time ?? performance.now();
+    this.active = active ?? false;
   }
 
   onAttached() {

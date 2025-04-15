@@ -18,6 +18,8 @@ export class InputManager extends Manager {
       left_clicked: false,
       right_clicked: false,
       middle_clicked: false,
+      last_mouse_down: 0,
+      last_mouse_up: 0,
     };
 
     this.keyStates = {
@@ -50,13 +52,6 @@ export class InputManager extends Manager {
     });
 
     canvas.addEventListener("mousedown", (evt) => {
-      this.input_stack.push({
-        type: DRAG,
-        mouse: this.mouse,
-        timestamp: performance.now(),
-        evt,
-      });
-
       if (evt.button === 0) {
         this.mouse.left_clicked = true;
       }
@@ -69,13 +64,6 @@ export class InputManager extends Manager {
     });
 
     canvas.addEventListener("mouseup", (evt) => {
-      this.input_stack.push({
-        type: DROP,
-        mouse: this.mouse,
-        timestamp: performance.now(),
-        evt,
-      });
-
       if (evt.button === 0) {
         this.mouse.left_clicked = false;
       }
@@ -117,12 +105,14 @@ export class InputManager extends Manager {
   }
 
   mouseDown() {
-    return this.input_stack.find(
-      (input) =>
-        input.evt.button === 0 ||
-        input.evt.button === 1 ||
-        input.evt.button === 2
-    );
+    for (const key in this.mouse) {
+      if (this.mouse.hasOwnProperty(key)) {
+        if (this.mouse[key] === true) {
+          return { key: key, value: this.mouse[key] };
+        }
+      }
+    }
+    return null;
   }
 
   useInputType(input) {
@@ -134,5 +124,7 @@ export class InputManager extends Manager {
 
   destroy(canvas) {
     canvas.removeEventListener("click");
+    canvas.removeEventListener("mousedown");
+    canvas.removeEventListener("mouseup");
   }
 }
