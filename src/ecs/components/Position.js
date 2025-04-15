@@ -27,11 +27,8 @@ export class Position extends Component {
   }
 
   onMovePosition(evt) {
-    // console.log("Move Position!");
     const { mouse } = evt.data;
-    // console.log(mouse);
     this.previous_position.copy(this.coords);
     this.coords.copy(mouse);
-    // this.coords.set(mouse.x, mouse.y, mouse.z);
   }
 }

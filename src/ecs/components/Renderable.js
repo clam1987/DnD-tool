@@ -26,6 +26,8 @@ export class Renderable extends Component {
       case "text":
         this.displayText(this.entity.text.text, this.entity.style.css, group);
         break;
+      case "gltf":
+        break;
       default:
         console.warn(`Unknown renderable type: ${this.type}`);
     }
@@ -36,7 +38,7 @@ export class Renderable extends Component {
 
   onUpdateObject(evt) {}
 
-  displayMesh(size, style, group) {
+  displayMesh(size, style, parent_group) {
     const { width, height } = size;
     const geometry = new THREE.BoxGeometry(width, height, 0.1);
     const material = new THREE.MeshBasicMaterial({
@@ -44,12 +46,20 @@ export class Renderable extends Component {
     });
     const box_mesh = new THREE.Mesh(geometry, material);
     box_mesh.position.copy(this.entity.position.coords);
-    group.add(box_mesh);
+    parent_group.add(box_mesh);
 
     if (this.entity.text) {
-      this.displayText(this.entity.text.text, this.entity.style.css, group);
+      this.displayText(
+        this.entity.text.text,
+        this.entity.style.css,
+        parent_group
+      );
     }
   }
+
+  displaySprite(path, style, parent_group) {}
+
+  displayGLTF(path, style, parent_group) {}
 
   displayText(text, style, parent_group) {
     if (text === null) {
