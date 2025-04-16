@@ -24,13 +24,17 @@ export class AssetLoaderSystem extends System {
         const { spriteLoader } = entity;
         if (!spriteLoader.loaded) {
           this.asset_manager
-            .loadSprite(spriteLoader.asset_name, spriteLoader.path)
-            .then(() => {
-              entity.fireEvent("sprite-loaded");
+            .loadSprite(spriteLoader.asset_name, spriteLoader.asset_path)
+            .then((sprite) => {
+              // console.log(sprite);
+              // entity.fireEvent("sprite-loaded");
+            })
+            .catch((err) => {
+              console.error("Error loading sprite:", err);
             });
         }
       }
-
+      // console.log(this.gltf);
       for (const entity of this.gltf) {
         const { gltfLoader } = entity;
         if (!gltfLoader.loaded) {

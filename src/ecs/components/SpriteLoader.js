@@ -1,10 +1,11 @@
 import { Component } from "geotic";
 
 export class SpriteLoader extends Component {
-  constructor({ path, asset_name }) {
+  constructor({ asset_path, asset_name, json_path }) {
     super();
 
-    this.path = path ?? "";
+    this.asset_path = asset_path ?? "";
+    this.json_path = json_path ?? "";
     this.asset_name = asset_name ?? "";
     this.loaded = false;
   }

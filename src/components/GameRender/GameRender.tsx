@@ -1,15 +1,19 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import DnD_Config from "../../games/DnD/Dnd.json";
+// import DnD_Config from "";
 import Game from "../../ecs/core/Game";
 
 const GameRender = () => {
   const [game_config, setGameConfig] = useState<any>();
+  const [loading_config, setLoadingConfig] = useState<boolean>(false);
   const canvas_ref = useRef(null);
 
   useEffect(() => {
-    setGameConfig(DnD_Config);
-  }, []);
+    if (!loading_config && !game_config) {
+      setLoadingConfig(true);
+      loadGameConfig(null);
+    }
+  }, [loading_config, game_config]);
 
   useEffect(() => {
     const canvas = canvas_ref.current;
@@ -22,6 +26,19 @@ const GameRender = () => {
       if (game_cart) game_cart.destroy();
     };
   }, [game_config]);
+
+  const loadGameConfig = async (game: string | null) => {
+    try {
+      const response = await fetch("/games/dnd/DnD.json");
+      if (!response.ok) throw new Error("Network response was not ok");
+      const data = await response.json();
+      setGameConfig(data);
+    } catch (err) {
+      console.error("Failed to load game config:", err);
+    }
+  };
+
+  if (!game_config) return <div>Loading...</div>;
 
   return (
     <canvas

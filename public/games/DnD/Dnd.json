@@ -1,0 +1,171 @@
+{
+  "name": "DnD",
+  "total_players": 6,
+  "data": {
+    "scenes": [
+      {
+        "name": "GameScene",
+        "prefabs": ["HelloWorld", "Back_Button", "Test", "Sprite"],
+        "systems": []
+      }
+    ],
+    "systems": [],
+    "assets": {
+      "animations": [],
+      "idle_animations": {},
+      "images": [],
+      "sprites": [],
+      "tilemaps": []
+    },
+    "custom_scripts": ["changeColor"],
+    "prefabs": [
+      {
+        "name": "HelloWorld",
+        "components": [
+          {
+            "type": "Text",
+            "properties": {
+              "text": "Game Engine DnD"
+            }
+          },
+          {
+            "type": "Style",
+            "properties": {
+              "css": {
+                "fontFamily": "/assets/fonts/Sweet_Candies_Regular.json",
+                "color": "#ffffff",
+                "fontSize": 1,
+                "depth": 0.1
+              }
+            }
+          },
+          {
+            "type": "Position",
+            "properties": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "text",
+              "layer": "ui"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Back_Button",
+        "components": [
+          {
+            "type": "Text",
+            "properties": {
+              "text": "Back"
+            }
+          },
+          {
+            "type": "Position",
+            "properties": {
+              "x": 0,
+              "y": -1,
+              "z": 0
+            }
+          },
+          {
+            "type": "Button",
+            "properties": {
+              "style": {}
+            }
+          },
+          {
+            "type": "Style",
+            "properties": {
+              "css": {
+                "backgroundColor": "#2fc5f6",
+                "fontFamily": "/assets/fonts/Sweet_Candies_Regular.json",
+                "color": "#ffffff",
+                "fontSize": 0.5,
+                "depth": 0.1
+              }
+            }
+          },
+          {
+            "type": "Size",
+            "properties": {
+              "width": 2,
+              "height": 1
+            }
+          },
+          {
+            "type": "Interactive"
+          },
+          {
+            "type": "ActionHandler",
+            "properties": {
+              "actions": [
+                {
+                  "action": "changeURL",
+                  "payload": { "url": "/" },
+                  "type": "CLICK"
+                },
+                {
+                  "action": "changeColor",
+                  "payload": {
+                    "color": "#F0F6FC",
+                    "backgroundColor": "#80A0FA"
+                  },
+                  "type": "MOUSEENTER"
+                },
+                {
+                  "action": "changeColor",
+                  "payload": {
+                    "color": "#FFFFFF",
+                    "backgroundColor": "#2FC5F6"
+                  },
+                  "type": "MOUSELEAVE"
+                }
+              ]
+            }
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "mesh",
+              "layer": "ui"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sprite",
+        "components": [
+          {
+            "type": "Position",
+            "properties": {
+              "x": 2,
+              "y": -2,
+              "z": 1
+            }
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "sprite",
+              "layer": "ui"
+            }
+          },
+          {
+            "type": "SpriteLoader",
+            "properties": {
+              "asset_path": "/assets/sprites/lufia_spritesheet.png",
+              "asset_name": "lufia_spritesheet",
+              "json_path": "/assets/sprites/lufia.json"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

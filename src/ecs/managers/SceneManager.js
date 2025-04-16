@@ -54,7 +54,7 @@ export class SceneManager extends Manager {
 
     try {
       const scene_module = await import(
-        `../../games/${this.game.config.name}/scene/${name}`
+        `../../../public/games/${this.game.config.name}/scene/${name}`
       );
       const scene_instance = new scene_module.default(this.game);
       this.scene_manager.set(name, {

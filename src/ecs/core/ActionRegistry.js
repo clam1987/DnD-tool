@@ -65,12 +65,4 @@ export function registerDefaultActions() {
 
     entity.renderable.group.position.copy(new_pos);
   });
-
-  ActionRegistry.register("dragEnd", (entity, payload) => {
-    // console.log(`Drag End Payload: ${payload}`);
-    // console.log(payload);
-    // console.log(`Drag End Entity:`);
-    // console.log(entity);
-    // console.log("Drag End!");
-  });
 }

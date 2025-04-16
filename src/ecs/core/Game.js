@@ -1,8 +1,12 @@
 import ECS from "..";
 import World from "./World";
 import { ActionRegistry, registerDefaultActions } from "./ActionRegistry";
-import { RenderSystem, InteractiveActionSystem } from "../systems";
-import { SceneManager, InputManager } from "../managers";
+import {
+  RenderSystem,
+  InteractiveActionSystem,
+  AssetLoaderSystem,
+} from "../systems";
+import { SceneManager, InputManager, AssetLoaderManager } from "../managers";
 
 export default class Game {
   #last_update;
@@ -32,7 +36,7 @@ export default class Game {
 
     const systems = await this.loadSystems();
     systems.forEach((system) => {
-      this.systems.set(system.name, new system(this));
+      this.systems.set(system.name, new system.module(this));
     });
 
     registerDefaultActions();
@@ -45,11 +49,13 @@ export default class Game {
       "interactiveActionSystem",
       new InteractiveActionSystem(this)
     );
+    this.systems.set("assetLoaderSystem", new AssetLoaderSystem(this));
   }
 
   initializeManagers() {
     this.managers.set("sceneManager", new SceneManager(this));
     this.managers.set("inputManager", new InputManager(this));
+    this.managers.set("assetLoaderManager", new AssetLoaderManager(this));
   }
 
   async loadSystems() {
@@ -60,10 +66,13 @@ export default class Game {
       this.config.data.systems.map(async (system) => {
         try {
           const module = await import(
-            `../../games/${this.config.name}/systems/${system.name}`
+            `../../../public/games/${this.config.name}/systems/${system}.js`
           );
 
-          return module.default || module;
+          return {
+            name: system,
+            module: module[system],
+          };
         } catch (err) {
           console.error("Error loading system:", err);
           return null;
@@ -71,7 +80,7 @@ export default class Game {
       })
     );
 
-    return systems.filter(Boolean);
+    return systems;
   }
 
   async #registerCustomAction() {
@@ -85,9 +94,8 @@ export default class Game {
         this.config.data.custom_scripts.map(async (script) => {
           try {
             const module = await import(
-              `../../games/${this.config.name}/scripts/${script}.js`
+              `../../../public/games/${this.config.name}/scripts/${script}.js`
             );
-
             this.action_registry.register(script, module.default || module);
           } catch (err) {
             console.error("Error loading system:", err);
@@ -125,5 +133,6 @@ export default class Game {
 
   destroy() {
     this.world.destroyWorld();
+    this.action_registry.clear();
   }
 }
