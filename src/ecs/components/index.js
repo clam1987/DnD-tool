@@ -10,5 +10,5 @@ export { Renderable } from "./Renderable";
 export { Size } from "./Size";
 export { ActionHandler } from "./ActionHandler";
 export { Drag } from "./Drag";
-export { GLTFLoader } from "./GLTFLoader";
+export { GltfLoader } from "./GltfLoader";
 export { SpriteLoader } from "./SpriteLoader";

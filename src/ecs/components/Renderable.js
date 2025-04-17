@@ -5,9 +5,13 @@ import {
   MeshBasicMaterial,
   Mesh,
   PlaneGeometry,
+  Box3,
+  Box3Helper,
+  Vector3,
 } from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
+import { normalizeGLTF } from "../../utils/utils";
 // import Text from "troika-three-text";
 
 export class Renderable extends Component {
@@ -23,7 +27,7 @@ export class Renderable extends Component {
     const group = new Group();
     switch (this.type) {
       case "mesh":
-        this.displayMesh(this.entity.size, this.entity.style.css, group);
+        this.#displayMesh(this.entity.size, this.entity.style.css, group);
         break;
       case "sprite":
         const { texture, frames } = evt.data;
@@ -34,14 +38,16 @@ export class Renderable extends Component {
           return;
         }
 
-        this.displaySprite(name, group, frame_data, texture);
+        this.#displaySprite(name, group, frame_data, texture);
         break;
       case "line":
         break;
       case "text":
-        this.displayText(this.entity.text.text, this.entity.style.css, group);
+        this.#displayText(this.entity.text.text, this.entity.style.css, group);
         break;
       case "gltf":
+        const { model } = evt.data;
+        this.#displayGLTF(model, group);
         break;
       default:
         console.warn(`Unknown renderable type: ${this.type}`);
@@ -51,17 +57,9 @@ export class Renderable extends Component {
     evt.handle();
   }
 
-  onCreateSprite(evt) {
-    const { sprite_sheet_name } = this.entity.spriteLoader;
-    const group = new Group();
-    this.displaySprite(sprite_sheet_name, group);
-    this.group = group;
-    evt.handle();
-  }
-
   onUpdateObject(evt) {}
 
-  displayMesh(size, style, parent_group) {
+  #displayMesh(size, style, parent_group) {
     const { width, height } = size;
     const geometry = new BoxGeometry(width, height, 0.1);
     const material = new MeshBasicMaterial({
@@ -72,7 +70,7 @@ export class Renderable extends Component {
     parent_group.add(box_mesh);
 
     if (this.entity.text) {
-      this.displayText(
+      this.#displayText(
         this.entity.text.text,
         this.entity.style.css,
         parent_group
@@ -80,7 +78,7 @@ export class Renderable extends Component {
     }
   }
 
-  displaySprite(sprite_sheet_name, parent_group, frame_data, texture) {
+  #displaySprite(sprite_sheet_name, parent_group, frame_data, texture) {
     if (sprite_sheet_name === null || frame_data === null) return;
 
     const { frame, spriteSourceSize } = frame_data;
@@ -109,9 +107,39 @@ export class Renderable extends Component {
     parent_group.add(mesh);
   }
 
-  displayGLTF(path, style, parent_group) {}
+  #displayGLTF(model, parent_group) {
+    if (model === null) return;
 
-  displayText(text, style, parent_group) {
+    const normalized_model = normalizeGLTF(model, 2);
+    parent_group.add(normalized_model);
+    // const cloned_model = model.scene.clone(true);
+    // // cloned_model.position.set(0, 0, 0);
+    // cloned_model.scale.set(1, 1, 1);
+    // cloned_model.visible = true;
+    // const box = new Box3().setFromObject(cloned_model);
+    // const size = new Vector3();
+    // box.getSize(size);
+
+    // const max_dim = Math.max(size.x, size.y, size.z);
+    // const scale_factor = 1 / max_dim;
+    // // Apply normalized scale (optional multiplier to make it bigger)
+    // cloned_model.scale.setScalar(scale_factor * 2); // scale it to a visible size
+
+    // // Center the model
+    // const center = new Vector3();
+    // box.getCenter(center);
+    // cloned_model.position.sub(center); // moves the model to origin
+
+    // // Optionally, visualize the final box
+    // const final_box = new Box3().setFromObject(cloned_model);
+    // const helper = new Box3Helper(final_box, 0x00ff00); // green box now
+    // parent_group.add(cloned_model);
+    // parent_group.add(helper);
+    // this.group.add(helper);
+    // parent_group.add(helper);
+  }
+
+  #displayText(text, style, parent_group) {
     if (text === null) {
       text = "Hello World!";
     }

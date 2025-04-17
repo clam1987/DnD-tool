@@ -5,7 +5,7 @@
     "scenes": [
       {
         "name": "GameScene",
-        "prefabs": ["HelloWorld", "Back_Button", "Test", "Sprite"],
+        "prefabs": ["HelloWorld", "Back_Button", "Test", "Sprite", "Anime"],
         "systems": []
       }
     ],
@@ -19,6 +19,13 @@
           "sprite_path": "/assets/sprites/lufia_spritesheet.png",
           "sprite_name": "lufia_spritesheet",
           "json_path": "/assets/sprites/lufia.json",
+          "scene": "GameScene"
+        }
+      ],
+      "models": [
+        {
+          "model_path": "/assets/models/miyako_gltf/scene.gltf",
+          "model_name": "anime",
           "scene": "GameScene"
         }
       ],
@@ -168,6 +175,32 @@
             "properties": {
               "frame": "lufia-front",
               "name": "lufia_spritesheet"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Anime",
+        "components": [
+          {
+            "type": "Position",
+            "properties": {
+              "x": -4,
+              "y": -1,
+              "z": 0.665
+            }
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "gltf",
+              "layer": "ui"
+            }
+          },
+          {
+            "type": "GltfLoader",
+            "properties": {
+              "asset_name": "anime"
             }
           }
         ]

@@ -1,5 +1,5 @@
 import System from "../core/System";
-import { SpriteLoader, GLTFLoader } from "../components";
+import { SpriteLoader, GltfLoader } from "../components";
 
 export class AssetLoaderSystem extends System {
   constructor(game) {
@@ -12,7 +12,7 @@ export class AssetLoaderSystem extends System {
       all: [SpriteLoader],
     })._cache;
     this.gltf = game.world.world.createQuery({
-      all: [GLTFLoader],
+      all: [GltfLoader],
     })._cache;
   }
 

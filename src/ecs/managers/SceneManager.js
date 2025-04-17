@@ -57,8 +57,15 @@ export class SceneManager extends Manager {
         `../../../public/games/${this.game.config.name}/scene/${name}`
       );
       const scene_instance = new scene_module.default(this.game);
+      const scene_obj = new THREE.Scene();
+      const dir_light = new THREE.DirectionalLight(0xffffff, 1);
+      dir_light.position.set(5, 10, 7);
+      scene_obj.add(dir_light);
+      const ambient_light = new THREE.AmbientLight(0x404040, 2);
+      scene_obj.add(ambient_light);
+
       this.scene_manager.set(name, {
-        scene: new THREE.Scene(),
+        scene: scene_obj,
         logic: scene_instance,
       });
 

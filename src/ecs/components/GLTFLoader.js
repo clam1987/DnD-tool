@@ -1,10 +1,9 @@
 import { Component } from "geotic";
 
-export class GLTFLoader extends Component {
-  constructor({ path, asset_name }) {
+export class GltfLoader extends Component {
+  constructor({ asset_name }) {
     super();
 
-    this.path = path ?? "";
     this.asset_name = asset_name ?? "";
     this.loaded = false;
   }

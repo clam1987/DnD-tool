@@ -41,7 +41,12 @@ export class AssetLoaderManager extends Manager {
     if (this.cache.has(name)) return this.cache.get(name);
     const loader = new GLTFLoader();
     const gltf = await new Promise((res, rej) => {
-      loader.load(path, res, undefined, rej);
+      loader.load(
+        `/games/${this.game.config.name}${asset_path}`,
+        res,
+        undefined,
+        rej
+      );
     });
     this.cache.set(name, gltf);
 
@@ -53,7 +58,7 @@ export class AssetLoaderManager extends Manager {
       console.error("Incorrect config!");
       return this.cache;
     }
-    const { sprites } = config.data.assets;
+    const { sprites, models } = config.data.assets;
     const loading_promises = [];
 
     try {
@@ -63,14 +68,24 @@ export class AssetLoaderManager extends Manager {
         const filtered_sprites = sprites.filter(({ scene }) =>
           scene_set.has(scene)
         );
-        filtered_sprites.forEach(
-          ({ sprite_name, sprite_path, json_path, scene }) => {
-            this.total_assets++;
-            loading_promises.push(
-              this.loadSprite(sprite_name, sprite_path, json_path)
-            );
-          }
+        filtered_sprites.forEach(({ sprite_name, sprite_path, json_path }) => {
+          this.total_assets++;
+          loading_promises.push(
+            this.loadSprite(sprite_name, sprite_path, json_path)
+          );
+        });
+      }
+
+      if (models && Array.isArray(models)) {
+        const scene_list = config.data.scenes.map((scene) => scene.name);
+        const scene_set = new Set(scene_list);
+        const filtered_models = models.filter(({ scene }) =>
+          scene_set.has(scene)
         );
+        filtered_models.forEach(({ model_name, model_path }) => {
+          this.total_assets++;
+          loading_promises.push(this.loadGLTF(model_name, model_path));
+        });
       }
 
       await Promise.all(loading_promises);
