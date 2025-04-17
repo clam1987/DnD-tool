@@ -49,7 +49,7 @@ export default class GameScene extends Scene {
         properties: {
           css: {
             backgroundColor: "#2fc5f6",
-            fontFamily: "/assets/fonts/Sweet_Candies_Regular.json",
+            fontFamily: "/assets/fonts/Sweet_Candies.otf",
             color: "#ffffff",
             fontSize: 0.5,
             depth: 0.1,

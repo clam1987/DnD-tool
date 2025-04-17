@@ -11,9 +11,10 @@ export default function changeColor(entity, payload) {
     );
     const text_mesh = group.children.find(
       (mesh) =>
-        mesh.geometry.type === "TextGeometry" &&
+        mesh.geometry.type === "InstancedBufferGeometry" &&
         mesh.material.type === "MeshBasicMaterial"
     );
+
     const current_background_color = button_mesh.material.color.getHexString();
     const current_text_color = text_mesh.material.color.getHexString();
     backgroundColor = backgroundColor || `#${current_background_color}`;

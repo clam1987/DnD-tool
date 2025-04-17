@@ -12,7 +12,7 @@ import {
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import { normalizeGLTF } from "../../utils/utils";
-// import Text from "troika-three-text";
+import { Text } from "troika-three-text";
 
 export class Renderable extends Component {
   constructor({ type, layer }) {
@@ -121,39 +121,36 @@ export class Renderable extends Component {
 
     if (style === null) {
       style = {
-        fontFamily: "/assets/fonts/Harmony_Regular.json",
+        fontFamily: "/assets/fonts/Harmony.otf",
         fontSize: 10,
         color: "#ffffff",
         depth: 0.1,
       };
     }
 
-    const fontLoader = new FontLoader();
-    fontLoader.load(style.fontFamily, (font) => {
-      const geometry = new TextGeometry(text, {
-        font,
-        size: style.fontSize,
-        depth: style.depth,
-        curveSegments: 12,
-        bevelEnabled: false,
-      });
-      geometry.center();
+    const text_mesh = new Text();
 
-      const material = new MeshBasicMaterial({
-        color: style.color,
-      });
-      const text_mesh = new Mesh(geometry, material);
+    text_mesh.text = text;
+    text_mesh.fontSize = style.fontSize;
+    text_mesh.color = style.color;
+    text_mesh.font = style.fontFamily;
+    text_mesh.anchorX = "center";
+    text_mesh.anchorY = "middle";
+    text_mesh.sync();
 
-      if (text_mesh.position === null) {
-        text_mesh.position.set(0, 0, 0);
-      }
+    // Positioning: center in group with slight Z offset
+    if (text_mesh.position === null) {
+      text_mesh.position.set(0, 0, 0);
+    }
 
-      text_mesh.position.copy({
-        ...this.entity.position.coords,
-        z: this.entity.position.coords.z + 0.06,
-      });
-
-      parent_group.add(text_mesh);
+    text_mesh.position.copy({
+      ...this.entity.position.coords,
+      z: this.entity.position.coords.z + 0.06,
     });
+
+    const { x, y, z } = this.entity.position.coords;
+    text_mesh.position.set(x, y, z + 0.06);
+
+    parent_group.add(text_mesh);
   }
 }

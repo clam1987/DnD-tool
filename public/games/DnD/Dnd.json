@@ -46,7 +46,7 @@
             "type": "Style",
             "properties": {
               "css": {
-                "fontFamily": "/assets/fonts/Sweet_Candies_Regular.json",
+                "fontFamily": "/assets/fonts/Sweet_Candies.otf",
                 "color": "#ffffff",
                 "fontSize": 1,
                 "depth": 0.1
@@ -98,7 +98,7 @@
             "properties": {
               "css": {
                 "backgroundColor": "#2fc5f6",
-                "fontFamily": "/assets/fonts/Sweet_Candies_Regular.json",
+                "fontFamily": "/assets/fonts/Sweet_Candies.otf",
                 "color": "#ffffff",
                 "fontSize": 0.5,
                 "depth": 0.1
