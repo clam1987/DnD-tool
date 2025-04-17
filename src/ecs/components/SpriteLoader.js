@@ -1,12 +1,11 @@
 import { Component } from "geotic";
 
 export class SpriteLoader extends Component {
-  constructor({ asset_path, asset_name, json_path }) {
+  constructor({ frame, name }) {
     super();
 
-    this.asset_path = asset_path ?? "";
-    this.json_path = json_path ?? "";
-    this.asset_name = asset_name ?? "";
+    this.frame = frame ?? null;
+    this.name = name ?? null;
     this.loaded = false;
   }
 
@@ -19,6 +18,12 @@ export class SpriteLoader extends Component {
   onSpriteOffLoaded(evt) {
     this.loaded = false;
 
+    evt.handle();
+  }
+
+  onUpdateFrame(evt) {
+    const { frame } = evt.data;
+    this.frame = frame;
     evt.handle();
   }
 }

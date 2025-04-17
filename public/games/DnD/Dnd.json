@@ -14,7 +14,14 @@
       "animations": [],
       "idle_animations": {},
       "images": [],
-      "sprites": [],
+      "sprites": [
+        {
+          "sprite_path": "/assets/sprites/lufia_spritesheet.png",
+          "sprite_name": "lufia_spritesheet",
+          "json_path": "/assets/sprites/lufia.json",
+          "scene": "GameScene"
+        }
+      ],
       "tilemaps": []
     },
     "custom_scripts": ["changeColor"],
@@ -159,9 +166,8 @@
           {
             "type": "SpriteLoader",
             "properties": {
-              "asset_path": "/assets/sprites/lufia_spritesheet.png",
-              "asset_name": "lufia_spritesheet",
-              "json_path": "/assets/sprites/lufia.json"
+              "frame": "lufia-front",
+              "name": "lufia_spritesheet"
             }
           }
         ]

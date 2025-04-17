@@ -1,5 +1,11 @@
 import { Component } from "geotic";
-import * as THREE from "three";
+import {
+  Group,
+  BoxGeometry,
+  MeshBasicMaterial,
+  Mesh,
+  PlaneGeometry,
+} from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 // import Text from "troika-three-text";
@@ -14,12 +20,21 @@ export class Renderable extends Component {
   }
 
   onCreateObject(evt) {
-    const group = new THREE.Group();
+    const group = new Group();
     switch (this.type) {
       case "mesh":
         this.displayMesh(this.entity.size, this.entity.style.css, group);
         break;
       case "sprite":
+        const { texture, frames } = evt.data;
+        const { frame, name } = this.entity.spriteLoader;
+        const frame_data = frames[frame];
+        if (frame_data === undefined) {
+          console.warn(`Frame "${frame}" not found for frame: ${name}`);
+          return;
+        }
+
+        this.displaySprite(name, group, frame_data, texture);
         break;
       case "line":
         break;
@@ -36,15 +51,23 @@ export class Renderable extends Component {
     evt.handle();
   }
 
+  onCreateSprite(evt) {
+    const { sprite_sheet_name } = this.entity.spriteLoader;
+    const group = new Group();
+    this.displaySprite(sprite_sheet_name, group);
+    this.group = group;
+    evt.handle();
+  }
+
   onUpdateObject(evt) {}
 
   displayMesh(size, style, parent_group) {
     const { width, height } = size;
-    const geometry = new THREE.BoxGeometry(width, height, 0.1);
-    const material = new THREE.MeshBasicMaterial({
+    const geometry = new BoxGeometry(width, height, 0.1);
+    const material = new MeshBasicMaterial({
       color: style.backgroundColor,
     });
-    const box_mesh = new THREE.Mesh(geometry, material);
+    const box_mesh = new Mesh(geometry, material);
     box_mesh.position.copy(this.entity.position.coords);
     parent_group.add(box_mesh);
 
@@ -57,7 +80,34 @@ export class Renderable extends Component {
     }
   }
 
-  displaySprite(path, style, parent_group) {}
+  displaySprite(sprite_sheet_name, parent_group, frame_data, texture) {
+    if (sprite_sheet_name === null || frame_data === null) return;
+
+    const { frame, spriteSourceSize } = frame_data;
+    const geometry = new PlaneGeometry(
+      spriteSourceSize.w / 100,
+      spriteSourceSize.h / 100
+    );
+    const material = new MeshBasicMaterial({
+      map: texture,
+      transparent: true,
+    });
+    const mesh = new Mesh(geometry, material);
+
+    const texture_w = texture.image.width;
+    const texture_h = texture.image.height;
+
+    const offset_x = frame.x / texture_w;
+    const offset_y = frame.y / texture_h;
+    const repeat_x = frame.w / texture_w;
+    const repeat_y = frame.h / texture_h;
+
+    texture.repeat.set(repeat_x, repeat_y);
+    texture.offset.set(offset_x, 1 - offset_y - repeat_y);
+    texture.needsUpdate = true;
+
+    parent_group.add(mesh);
+  }
 
   displayGLTF(path, style, parent_group) {}
 
@@ -86,10 +136,10 @@ export class Renderable extends Component {
       });
       geometry.center();
 
-      const material = new THREE.MeshBasicMaterial({
+      const material = new MeshBasicMaterial({
         color: style.color,
       });
-      const text_mesh = new THREE.Mesh(geometry, material);
+      const text_mesh = new Mesh(geometry, material);
 
       if (text_mesh.position === null) {
         text_mesh.position.set(0, 0, 0);

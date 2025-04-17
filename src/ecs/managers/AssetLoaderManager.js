@@ -1,19 +1,21 @@
 import Manager from "./Manager";
-import { TextureLoader } from "three";
+import { TextureLoader, SRGBColorSpace } from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import path from "path";
 
 export class AssetLoaderManager extends Manager {
   constructor(game) {
     super(game);
 
     this.cache = new Map();
+    this.total_assets = 0;
+    this.assets_loaded = 0;
+    this.sprites_loaded = false;
+    this.gltf_loaded = false;
+    this.ready = false;
   }
 
   async loadSprite(name, asset_path, json_path) {
     if (this.cache.has(name)) return this.cache.get(name);
-
-    // console.log(__dirname);
 
     const texture = await new Promise((res, rej) => {
       const loader = new TextureLoader();
@@ -24,14 +26,19 @@ export class AssetLoaderManager extends Manager {
         rej
       );
     });
-    this.cache.set(name, texture);
+
+    texture.colorSpace = SRGBColorSpace;
+
+    const json = await fetch(`/games/${this.game.config.name}${json_path}`);
+    const json_data = await json.json();
+
+    this.cache.set(name, { texture, frames: json_data.frames });
 
     return texture;
   }
 
   async loadGLTF(name, asset_path) {
     if (this.cache.has(name)) return this.cache.get(name);
-
     const loader = new GLTFLoader();
     const gltf = await new Promise((res, rej) => {
       loader.load(path, res, undefined, rej);
@@ -39,6 +46,40 @@ export class AssetLoaderManager extends Manager {
     this.cache.set(name, gltf);
 
     return gltf;
+  }
+
+  async loadAssets(config) {
+    if (!config) {
+      console.error("Incorrect config!");
+      return this.cache;
+    }
+    const { sprites } = config.data.assets;
+    const loading_promises = [];
+
+    try {
+      if (sprites && Array.isArray(sprites)) {
+        const scene_list = config.data.scenes.map((scene) => scene.name);
+        const scene_set = new Set(scene_list);
+        const filtered_sprites = sprites.filter(({ scene }) =>
+          scene_set.has(scene)
+        );
+        filtered_sprites.forEach(
+          ({ sprite_name, sprite_path, json_path, scene }) => {
+            this.total_assets++;
+            loading_promises.push(
+              this.loadSprite(sprite_name, sprite_path, json_path)
+            );
+          }
+        );
+      }
+
+      await Promise.all(loading_promises);
+      this.ready = true;
+      return this.cache;
+    } catch (err) {
+      console.error("Error loading assets:", err);
+      return this.cache;
+    }
   }
 
   get(name) {

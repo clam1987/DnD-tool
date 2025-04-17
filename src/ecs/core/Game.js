@@ -1,11 +1,7 @@
 import ECS from "..";
 import World from "./World";
 import { ActionRegistry, registerDefaultActions } from "./ActionRegistry";
-import {
-  RenderSystem,
-  InteractiveActionSystem,
-  AssetLoaderSystem,
-} from "../systems";
+import { RenderSystem, InteractiveActionSystem } from "../systems";
 import { SceneManager, InputManager, AssetLoaderManager } from "../managers";
 
 export default class Game {
@@ -17,12 +13,11 @@ export default class Game {
     this.world = new World(this);
     this.systems = new Map();
     this.managers = new Map();
-    this.initializeSystems();
-    this.initializeManagers();
-    this.initialize();
     this.canvas = canvas_ref.current || null;
     this.#last_update = Date.now();
     this.action_registry = ActionRegistry;
+    this.initializeManagers();
+    this.initialize();
 
     window.game = this;
   }
@@ -34,6 +29,9 @@ export default class Game {
       this.ecs.engine.registerPrefab(prefab);
     });
 
+    const asset_manager = this.managers.get("assetLoaderManager");
+    await asset_manager.loadAssets(this.config);
+
     const systems = await this.loadSystems();
     systems.forEach((system) => {
       this.systems.set(system.name, new system.module(this));
@@ -41,6 +39,8 @@ export default class Game {
 
     registerDefaultActions();
     await this.#registerCustomAction();
+
+    this.initializeSystems();
   }
 
   initializeSystems() {
@@ -49,7 +49,6 @@ export default class Game {
       "interactiveActionSystem",
       new InteractiveActionSystem(this)
     );
-    this.systems.set("assetLoaderSystem", new AssetLoaderSystem(this));
   }
 
   initializeManagers() {
@@ -109,10 +108,10 @@ export default class Game {
   start() {
     this.#last_update = Date.now();
     this.runtime = this.runtime.bind(this);
+    this.managers.get("inputManager").initialize(this.canvas);
     this.managers
       .get("sceneManager")
       .initialize(this.canvas, this.config.data.scenes);
-    this.managers.get("inputManager").initialize(this.canvas);
     this.runtime();
   }
 

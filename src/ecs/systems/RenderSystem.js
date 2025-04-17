@@ -8,6 +8,7 @@ export class RenderSystem extends System {
     this.game = game;
     this.rendered = new Set();
     this.scene = null;
+    this.asset_manager = game.managers.get("assetLoaderManager");
     this.renderable = game.world.world.createQuery({
       all: [Renderable],
     })._cache;
@@ -24,10 +25,25 @@ export class RenderSystem extends System {
       renderer.render(this.scene, camera);
     }
 
+    if (!this.asset_manager) {
+      this.asset_manager = this.game.managers.get("assetLoaderManager");
+    }
+
     for (const entity of this.renderable) {
       const { id, renderable, position } = entity;
       if (!this.rendered.has(id) && !this.renderable.updated) {
-        entity.fireEvent("create-object");
+        if (entity?.spriteLoader) {
+          const asset = this.asset_manager.get(entity.spriteLoader.name);
+          if (asset) {
+            const { texture, frames } = asset;
+            entity.fireEvent("create-object", {
+              texture,
+              frames,
+            });
+          }
+        } else {
+          entity.fireEvent("create-object");
+        }
       }
 
       if (renderable.group && !this.rendered.has(id)) {
