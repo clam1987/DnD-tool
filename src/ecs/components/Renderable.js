@@ -112,31 +112,6 @@ export class Renderable extends Component {
 
     const normalized_model = normalizeGLTF(model, 2);
     parent_group.add(normalized_model);
-    // const cloned_model = model.scene.clone(true);
-    // // cloned_model.position.set(0, 0, 0);
-    // cloned_model.scale.set(1, 1, 1);
-    // cloned_model.visible = true;
-    // const box = new Box3().setFromObject(cloned_model);
-    // const size = new Vector3();
-    // box.getSize(size);
-
-    // const max_dim = Math.max(size.x, size.y, size.z);
-    // const scale_factor = 1 / max_dim;
-    // // Apply normalized scale (optional multiplier to make it bigger)
-    // cloned_model.scale.setScalar(scale_factor * 2); // scale it to a visible size
-
-    // // Center the model
-    // const center = new Vector3();
-    // box.getCenter(center);
-    // cloned_model.position.sub(center); // moves the model to origin
-
-    // // Optionally, visualize the final box
-    // const final_box = new Box3().setFromObject(cloned_model);
-    // const helper = new Box3Helper(final_box, 0x00ff00); // green box now
-    // parent_group.add(cloned_model);
-    // parent_group.add(helper);
-    // this.group.add(helper);
-    // parent_group.add(helper);
   }
 
   #displayText(text, style, parent_group) {
