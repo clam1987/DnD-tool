@@ -1,0 +1,30 @@
+{
+  "name": "Camera3d",
+  "components": [
+    {
+      "type": "Camera",
+      "properties": {
+        "type": "perspective",
+        "fov": 75,
+        "near": 0.1,
+        "far": 1000
+      }
+    },
+    {
+      "type": "Position",
+      "properties": {
+        "x": 0,
+        "y": 5,
+        "z": 10
+      }
+    },
+    {
+      "type": "Rotation",
+      "properties": {
+        "x": -30,
+        "y": 0,
+        "z": 0
+      }
+    }
+  ]
+}

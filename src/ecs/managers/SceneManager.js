@@ -15,14 +15,6 @@ export class SceneManager extends Manager {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setClearColor("#878787");
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    this.camera.position.z = 5;
-    // this.camera.rotation.y += Math.PI / 4;
 
     window.addEventListener("resize", this.onResize);
     await this.loadScene(this.game.config.data.scenes[0]);
@@ -58,11 +50,6 @@ export class SceneManager extends Manager {
       );
       const scene_instance = new scene_module.default(this.game);
       const scene_obj = new THREE.Scene();
-      const dir_light = new THREE.DirectionalLight(0xffffff, 1);
-      dir_light.position.set(5, 10, 7);
-      scene_obj.add(dir_light);
-      const ambient_light = new THREE.AmbientLight(0x404040, 2);
-      scene_obj.add(ambient_light);
 
       this.scene_manager.set(name, {
         scene: scene_obj,
@@ -102,6 +89,10 @@ export class SceneManager extends Manager {
 
   getCamera() {
     return this.camera;
+  }
+
+  setCamera(camera) {
+    this.camera = camera;
   }
 
   getRenderer() {

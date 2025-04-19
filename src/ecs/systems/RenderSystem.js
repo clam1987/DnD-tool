@@ -22,7 +22,9 @@ export class RenderSystem extends System {
       const camera = sceneManager.getCamera();
       const renderer = sceneManager.getRenderer();
 
-      renderer.render(this.scene, camera);
+      if (camera && renderer) {
+        renderer.render(this.scene, camera);
+      }
     }
 
     if (!this.asset_manager) {

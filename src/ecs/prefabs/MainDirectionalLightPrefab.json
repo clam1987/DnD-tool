@@ -1,0 +1,30 @@
+{
+  "name": "MainDirectionalLight",
+  "components": [
+    {
+      "type": "Position",
+      "properties": {
+        "x": 10,
+        "y": 10,
+        "z": 10
+      }
+    },
+    {
+      "type": "Light",
+      "properties": {
+        "type": "directional",
+        "color": "#ffffff",
+        "intensity": 1,
+        "castShadow": true
+      }
+    },
+    {
+      "type": "Rotation",
+      "properties": {
+        "x": -45,
+        "y": 45,
+        "z": 0
+      }
+    }
+  ]
+}

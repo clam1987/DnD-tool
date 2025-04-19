@@ -1,7 +1,14 @@
 import ECS from "..";
 import World from "./World";
 import { ActionRegistry, registerDefaultActions } from "./ActionRegistry";
-import { RenderSystem, InteractiveActionSystem } from "../systems";
+import {
+  RenderSystem,
+  InteractiveActionSystem,
+  InputActionSystem,
+  MovementSystem,
+  CameraSystem,
+  LightSystem,
+} from "../systems";
 import { SceneManager, InputManager, AssetLoaderManager } from "../managers";
 
 export default class Game {
@@ -49,6 +56,10 @@ export default class Game {
       "interactiveActionSystem",
       new InteractiveActionSystem(this)
     );
+    this.systems.set("inputActionSystem", new InputActionSystem(this));
+    this.systems.set("movementSystem", new MovementSystem(this));
+    this.systems.set("cameraSystem", new CameraSystem(this));
+    this.systems.set("lightSystem", new LightSystem(this));
   }
 
   initializeManagers() {

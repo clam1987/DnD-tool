@@ -2,13 +2,20 @@ import EventEmitter from "events";
 import { Vector3 } from "three";
 import Manager from "./Manager";
 import { Interactive } from "../components";
-import { CLICK, DRAG, DROP } from "../../utils/actions";
+import {
+  CLICK,
+  MOVE_BACKWARD,
+  MOVE_FORWARD,
+  MOVE_LEFT,
+  MOVE_RIGHT,
+  KEYDOWN,
+  KEYUP,
+} from "../../utils/actions";
 export class InputManager extends Manager {
   #eventEmitter;
   constructor(game) {
     super(game);
 
-    this.keys = {};
     this.combos = {};
     this.input_stack = [];
     this.action_in_progress = false;
@@ -22,7 +29,13 @@ export class InputManager extends Manager {
       last_mouse_up: 0,
     };
 
-    this.keyStates = {
+    this.key_map = {
+      KeyW: MOVE_FORWARD,
+      KeyA: MOVE_LEFT,
+      KeyS: MOVE_BACKWARD,
+      KeyD: MOVE_RIGHT,
+    };
+    this.key_states = {
       move_up: false,
       move_down: false,
       move_left: false,
@@ -74,6 +87,9 @@ export class InputManager extends Manager {
         this.mouse.right_clicked = false;
       }
     });
+
+    canvas.addEventListener("keydown", (evt) => this.onKeyDown(evt));
+    canvas.addEventListener("keyup", (evt) => this.onKeyUp(evt));
   }
 
   getMouse() {
@@ -120,6 +136,32 @@ export class InputManager extends Manager {
     if (index !== -1) {
       this.input_stack.splice(index, 1);
     }
+  }
+
+  onKeyDown(e) {
+    if (!this.key_states[e.code]) {
+      this.key_states[e.code] = true;
+      const action = this.key_map[e.code];
+      if (action)
+        this.input_stack.push({
+          type: KEYDOWN,
+          key: e.code,
+          action,
+          timestamp: performance.now(),
+        });
+    }
+  }
+
+  onKeyUp(e) {
+    this.key_states[e.code] = false;
+    const action = this.key_map[e.code];
+    if (action)
+      this.input_stack.push({
+        type: KEYUP,
+        key: e.code,
+        action,
+        timestamp: performance.now(),
+      });
   }
 
   destroy(canvas) {

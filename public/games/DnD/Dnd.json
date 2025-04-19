@@ -5,7 +5,16 @@
     "scenes": [
       {
         "name": "GameScene",
-        "prefabs": ["HelloWorld", "Back_Button", "Test", "Sprite", "Anime"],
+        "prefabs": [
+          "MainDirectionalLight",
+          "AmbientLight",
+          "Camera3d",
+          "HelloWorld",
+          "Back_Button",
+          "Test",
+          "Sprite",
+          "Anime"
+        ],
         "systems": []
       }
     ],
@@ -32,7 +41,89 @@
       "tilemaps": []
     },
     "custom_scripts": ["changeColor"],
+    "actions": {
+      "MOVE_FORWARD": ["KeyW"],
+      "MOVE_BACKWARD": ["KeyS"],
+      "MOVE_LEFT": ["KeyA"],
+      "MOVE_RIGHT": ["KeyD"],
+      "camera-orbit": ["MouseRight"],
+      "camera-pan": ["MouseMiddle"],
+      "camera-zoom": ["Wheel"]
+    },
     "prefabs": [
+      {
+        "name": "MainDirectionalLight",
+        "components": [
+          {
+            "type": "Position",
+            "properties": {
+              "x": 10,
+              "y": 10,
+              "z": 10
+            }
+          },
+          {
+            "type": "Light",
+            "properties": {
+              "type": "directional",
+              "color": "#ffffff",
+              "intensity": 1,
+              "castShadow": true
+            }
+          },
+          {
+            "type": "Rotation",
+            "properties": {
+              "x": -45,
+              "y": 45,
+              "z": 0
+            }
+          }
+        ]
+      },
+      {
+        "name": "AmbientLight",
+        "components": [
+          {
+            "type": "Light",
+            "properties": {
+              "type": "ambient",
+              "color": "#404040",
+              "intensity": 2
+            }
+          }
+        ]
+      },
+      {
+        "name": "Camera3d",
+        "components": [
+          {
+            "type": "Camera",
+            "properties": {
+              "type": "perspective",
+              "fov": 75,
+              "near": 0.1,
+              "far": 1000
+            }
+          },
+          {
+            "type": "Position",
+            "properties": {
+              "x": 0,
+              "y": 0,
+              "z": 10
+            }
+          },
+          {
+            "type": "Rotation",
+            "properties": {
+              "x": -30,
+              "y": 0,
+              "z": 0
+            }
+          }
+        ]
+      },
       {
         "name": "HelloWorld",
         "components": [
@@ -175,6 +266,12 @@
             "properties": {
               "frame": "lufia-front",
               "name": "lufia_spritesheet"
+            }
+          },
+          {
+            "type": "Player",
+            "properties": {
+              "speed": 3
             }
           }
         ]

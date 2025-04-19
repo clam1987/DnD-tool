@@ -1,0 +1,22 @@
+{
+  "name": "Camera2d",
+  "components": [
+    {
+      "type": "Camera",
+      "properties": {
+        "type": "orthographic",
+        "fov": 75,
+        "near": 0.1,
+        "far": 1000
+      }
+    },
+    {
+      "type": "Position",
+      "properties": {
+        "x": 0,
+        "y": 0,
+        "z": 10
+      }
+    }
+  ]
+}

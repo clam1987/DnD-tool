@@ -6,7 +6,7 @@ import Game from "../../ecs/core/Game";
 const GameRender = () => {
   const [game_config, setGameConfig] = useState<any>();
   const [loading_config, setLoadingConfig] = useState<boolean>(false);
-  const canvas_ref = useRef(null);
+  const canvas_ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (!loading_config && !game_config) {
@@ -18,6 +18,8 @@ const GameRender = () => {
   useEffect(() => {
     const canvas = canvas_ref.current;
     if (!game_config || !canvas) return;
+
+    canvas.focus();
 
     const game_cart = new Game(game_config, canvas_ref);
     game_cart.start();
@@ -45,6 +47,7 @@ const GameRender = () => {
       ref={canvas_ref}
       height={window.innerHeight}
       width={window.innerWidth}
+      tabIndex={0}
     />
   );
 };
