@@ -20,6 +20,9 @@ export class MovementSystem extends System {
         const { vector, speed } = entity.velocity;
         const { coords } = entity.position;
         coords.addScaledVector(vector, speed * dt);
+        entity.fireEvent("update-position", {
+          coords,
+        });
 
         if (entity.renderable?.group) {
           entity.renderable.group.position.copy(coords);

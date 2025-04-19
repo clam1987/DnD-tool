@@ -1,4 +1,11 @@
 import { Vector3 } from "three";
+import { Velocity } from "../components";
+import {
+  MOVE_BACKWARD,
+  MOVE_FORWARD,
+  MOVE_LEFT,
+  MOVE_RIGHT,
+} from "../../utils/actions";
 
 const action_registry = new Map();
 
@@ -9,14 +16,14 @@ export const ActionRegistry = {
     }
     action_registry.set(name, fn);
   },
-  execute(name, entity, payload) {
+  execute(name, entity, payload, context) {
     const fn = action_registry.get(name);
     if (!fn) {
       console.warn(`Action ${name}, does not exist in registry.`);
       return;
     }
 
-    fn(entity, payload);
+    fn(entity, payload, context);
   },
   clear() {
     action_registry.clear();
@@ -64,5 +71,50 @@ export function registerDefaultActions() {
     entity.position.coords.copy(new_pos);
 
     entity.renderable.group.position.copy(new_pos);
+  });
+
+  ActionRegistry.register("movement", (entity, payload, { input_manager }) => {
+    const actions = input_manager.getActiveActions();
+    const movement_plane = entity.spriteLoader
+      ? "2d"
+      : entity.gltfLoader
+      ? "3d"
+      : "2d";
+
+    if (!entity.velocity) {
+      entity.add(Velocity, {
+        vector: new Vector3(0, 0, 0),
+        speed: entity.player.speed,
+      });
+    }
+
+    const vector = entity.velocity.vector;
+    const speed = entity.velocity.speed / 1000;
+    vector.set(0, 0, 0);
+
+    for (const action of payload.directions) {
+      if (actions.includes(action)) {
+        switch (action) {
+          case MOVE_FORWARD:
+            if (movement_plane === "2d") vector.y += speed;
+            else vector.z -= speed;
+            break;
+          case MOVE_BACKWARD:
+            if (movement_plane === "2d") vector.y -= speed;
+            else vector.z += speed;
+            break;
+          case MOVE_LEFT:
+            vector.x -= speed;
+            break;
+          case MOVE_RIGHT:
+            vector.x += speed;
+            break;
+        }
+      }
+    }
+    // Normalize vector to prevent faster diagonal movement
+    if (vector.lengthSq() > 0) {
+      vector.normalize().multiplyScalar(speed);
+    }
   });
 }

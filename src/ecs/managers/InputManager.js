@@ -13,10 +13,9 @@ import {
 } from "../../utils/actions";
 export class InputManager extends Manager {
   #eventEmitter;
-  constructor(game) {
+  constructor(game, actions) {
     super(game);
-
-    this.combos = {};
+    this.bindings = {};
     this.input_stack = [];
     this.action_in_progress = false;
     this.mouse = {
@@ -87,6 +86,10 @@ export class InputManager extends Manager {
     canvas.addEventListener("keyup", (evt) => this.onKeyUp(evt));
   }
 
+  setBindings(bindings) {
+    this.bindings = bindings;
+  }
+
   getMouse() {
     return this.mouse;
   }
@@ -139,6 +142,26 @@ export class InputManager extends Manager {
 
   onKeyUp(e) {
     this.active_keys.delete(e.code);
+  }
+
+  getActiveActions() {
+    const actions = [];
+
+    for (const [action, combos] of Object.entries(this.bindings)) {
+      for (const combo of combos) {
+        const combo_set = new Set(combo);
+        const is_matched = [...combo_set].every((key) =>
+          this.active_keys.has(key)
+        );
+
+        if (is_matched) {
+          actions.push(action);
+          break;
+        }
+      }
+    }
+
+    return actions;
   }
 
   getActiveKeys() {

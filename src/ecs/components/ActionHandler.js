@@ -6,4 +6,11 @@ export class ActionHandler extends Component {
 
     this.actions = actions || null;
   }
+
+  onUpdateActions(evt) {
+    const { actions } = evt.data;
+    this.actions = actions;
+
+    evt.handle();
+  }
 }

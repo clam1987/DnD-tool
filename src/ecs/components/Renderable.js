@@ -5,12 +5,7 @@ import {
   MeshBasicMaterial,
   Mesh,
   PlaneGeometry,
-  Box3,
-  Box3Helper,
-  Vector3,
 } from "three";
-import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
-import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import { normalizeGLTF } from "../../utils/utils";
 import { Text } from "troika-three-text";
 

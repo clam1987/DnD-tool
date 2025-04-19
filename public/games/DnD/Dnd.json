@@ -42,10 +42,10 @@
     },
     "custom_scripts": ["changeColor"],
     "actions": {
-      "MOVE_FORWARD": ["KeyW"],
-      "MOVE_BACKWARD": ["KeyS"],
-      "MOVE_LEFT": ["KeyA"],
-      "MOVE_RIGHT": ["KeyD"],
+      "MOVE_FORWARD": [["KeyW"]],
+      "MOVE_BACKWARD": [["KeyS"]],
+      "MOVE_LEFT": [["KeyA"]],
+      "MOVE_RIGHT": [["KeyD"]],
       "camera-orbit": ["MouseRight"],
       "camera-pan": ["MouseMiddle"],
       "camera-zoom": ["Wheel"]
@@ -272,6 +272,25 @@
             "type": "Player",
             "properties": {
               "speed": 3
+            }
+          },
+          {
+            "type": "ActionHandler",
+            "properties": {
+              "actions": [
+                {
+                  "action": "movement",
+                  "payload": {
+                    "directions": [
+                      "MOVE_FORWARD",
+                      "MOVE_BACKWARD",
+                      "MOVE_LEFT",
+                      "MOVE_RIGHT"
+                    ]
+                  },
+                  "type": "KEYDOWN"
+                }
+              ]
             }
           }
         ]

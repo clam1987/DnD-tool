@@ -2,11 +2,11 @@ import { Component } from "geotic";
 import { Vector3 } from "three";
 
 export class Position extends Component {
-  constructor({ x, y, z, previous_position }) {
+  constructor({ x, y, z }) {
     super();
 
     this.coords = new Vector3(x, y, z);
-    this.previous_position = new Vector3();
+    this.previous_position = new Vector3(x, y, z);
   }
 
   get x() {
@@ -22,9 +22,9 @@ export class Position extends Component {
   }
 
   onUpdatePosition(evt) {
-    const { x, y, z } = evt.data;
-    this.previous_position.copy(this.coords);
-    this.coords.set(x, y, z);
+    const { coords } = evt.data;
+    this.previous_position.set(coords.x, coords.y, coords.z);
+    this.coords.set(coords.x, coords.y, coords.z);
   }
 
   onMovePosition(evt) {

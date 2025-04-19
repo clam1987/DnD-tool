@@ -120,9 +120,8 @@ export default class Game {
     this.#last_update = Date.now();
     this.runtime = this.runtime.bind(this);
     this.managers.get("inputManager").initialize(this.canvas);
-    this.managers
-      .get("sceneManager")
-      .initialize(this.canvas, this.config.data.scenes);
+    this.managers.get("inputManager").setBindings(this.config.data.actions);
+    this.managers.get("sceneManager").initialize(this.canvas);
     this.runtime();
   }
 
