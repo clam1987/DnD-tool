@@ -35,12 +35,7 @@ export class InputManager extends Manager {
       KeyS: MOVE_BACKWARD,
       KeyD: MOVE_RIGHT,
     };
-    this.key_states = {
-      move_up: false,
-      move_down: false,
-      move_left: false,
-      move_right: false,
-    };
+    this.active_keys = new Set();
     this.#eventEmitter = new EventEmitter();
 
     this.interactive = this.game.world.world.createQuery({
@@ -139,29 +134,15 @@ export class InputManager extends Manager {
   }
 
   onKeyDown(e) {
-    if (!this.key_states[e.code]) {
-      this.key_states[e.code] = true;
-      const action = this.key_map[e.code];
-      if (action)
-        this.input_stack.push({
-          type: KEYDOWN,
-          key: e.code,
-          action,
-          timestamp: performance.now(),
-        });
-    }
+    this.active_keys.add(e.code);
   }
 
   onKeyUp(e) {
-    this.key_states[e.code] = false;
-    const action = this.key_map[e.code];
-    if (action)
-      this.input_stack.push({
-        type: KEYUP,
-        key: e.code,
-        action,
-        timestamp: performance.now(),
-      });
+    this.active_keys.delete(e.code);
+  }
+
+  getActiveKeys() {
+    return Array.from(this.active_keys);
   }
 
   destroy(canvas) {

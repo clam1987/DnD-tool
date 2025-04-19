@@ -21,75 +21,49 @@ export class InputActionSystem extends System {
     })._cache;
   }
 
-  handleInputAction(filtered_inputs) {
-    if (!filtered_inputs) return;
-
-    const key_down = filtered_inputs.find((input) => input.type === KEYDOWN);
-    const key_up = filtered_inputs.find((input) => input.type === KEYUP);
-
-    if (key_down) {
-      for (const entity of this.player) {
-        const movement_plane = entity.spriteLoader
-          ? "2d"
-          : entity.gltfLoader
-          ? "3d"
-          : "2d";
-        if (!entity?.velocity) {
-          entity.add(Velocity, {
-            vector: new Vector3(0, 0, 0),
-            speed: entity.player.speed,
-          });
-        } else {
-          entity.velocity.vector.set(0, 0, 0);
-        }
-
-        const vector = entity.velocity.vector;
-        vector.set(0, 0, 0);
-
-        switch (key_down.action) {
-          case MOVE_FORWARD:
-            if (movement_plane === "2d")
-              vector.y = entity.velocity.speed / 1000;
-            if (movement_plane === "3d")
-              vector.z = -(entity.velocity.speed / 1000);
-            break;
-          case MOVE_BACKWARD:
-            if (movement_plane === "2d")
-              vector.y = -(entity.velocity.speed / 1000);
-            if (movement_plane === "3d")
-              vector.z = entity.velocity.speed / 1000;
-            break;
-          case MOVE_LEFT:
-            vector.x = -(entity.velocity.speed / 1000);
-            break;
-          case MOVE_RIGHT:
-            vector.x = entity.velocity.speed / 1000;
-            break;
-          default:
-            break;
-        }
-
-        if (key_up) {
-          vector.set(0, 0, 0);
-        }
-      }
-    }
-
-    if (key_up) {
-      this.input_manager.useInputType(key_down);
-      this.input_manager.useInputType(key_up);
-    }
-  }
-
   handleInputs(dt) {
-    const input_stack = this.input_manager.input_stack;
-    if (input_stack.length > 0) {
-      const filtered_input = input_stack.filter(
-        (input) => input.type === KEYUP || input.type === KEYDOWN
-      );
+    const active_keys = this.input_manager.getActiveKeys();
 
-      if (filtered_input.length > 0) {
-        this.handleInputAction(filtered_input);
+    for (const entity of this.player) {
+      const movement_plane = entity.spriteLoader
+        ? "2d"
+        : entity.gltfLoader
+        ? "3d"
+        : "2d";
+
+      if (!entity.velocity) {
+        entity.add(Velocity, {
+          vector: new Vector3(0, 0, 0),
+          speed: entity.player.speed,
+        });
+      }
+
+      const vector = entity.velocity.vector;
+      const speed = entity.velocity.speed / 1000;
+      vector.set(0, 0, 0);
+
+      // Multiple keys can be held simultaneously for diagonal movement
+      if (active_keys.includes("KeyW")) {
+        if (movement_plane === "2d") vector.y += speed;
+        else vector.z -= speed;
+      }
+
+      if (active_keys.includes("KeyS")) {
+        if (movement_plane === "2d") vector.y -= speed;
+        else vector.z += speed;
+      }
+
+      if (active_keys.includes("KeyA")) {
+        vector.x -= speed;
+      }
+
+      if (active_keys.includes("KeyD")) {
+        vector.x += speed;
+      }
+
+      // Normalize vector to prevent faster diagonal movement
+      if (vector.lengthSq() > 0) {
+        vector.normalize().multiplyScalar(speed);
       }
     }
   }
