@@ -82,7 +82,6 @@ export class AnimationSystem extends System {
 
         if (idx !== state.frame) {
           const frame_data = sprite_sheet.frames[cfg_anim.frames[idx]];
-          // console.log(frame_data);
           if (frame_data) {
             entity.fireEvent("update-frame", { frame: idx });
             entity.fireEvent("update-sprite", { frame_data });
