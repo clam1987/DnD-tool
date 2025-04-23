@@ -9,6 +9,7 @@ export class AnimationState extends Component {
     this.time = time || 0; // The time elapsed in the current animation
     this.direction = direction || "front";
     this.previous_animation = { current: null, direction: null };
+    this.animation_update = false;
   }
 
   onUpdateTime(evt) {
@@ -28,6 +29,7 @@ export class AnimationState extends Component {
       this.current = current;
       this.time = 0;
       this.frame = 0;
+      this.animation_update = true;
     }
     evt.handle();
   }
@@ -35,6 +37,7 @@ export class AnimationState extends Component {
   onUpdateFrame(evt) {
     const { frame } = evt.data;
     this.frame = frame || this.frame;
+    this.animation_update = false;
 
     evt.handle();
   }
@@ -47,8 +50,14 @@ export class AnimationState extends Component {
         direction: this.direction,
       };
       this.direction = direction;
+      this.animation_update = true;
     }
 
+    evt.handle();
+  }
+
+  onAnimationComplete(evt) {
+    this.animation_update = false;
     evt.handle();
   }
 }

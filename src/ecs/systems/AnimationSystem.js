@@ -39,20 +39,40 @@ export class AnimationSystem extends System {
             const frame = sprite_sheet.frames[name];
             if (frame) {
               entity.fireEvent("update-sprite", { frame_data: frame });
-              entity.fireEvent("update-current", { current: "idle" });
-              entity.fireEvent("update-direction", { direction });
             }
           }
+
+          entity.fireEvent("update-current", { current: "idle" });
+          entity.fireEvent("update-direction", { direction });
+          entity.fireEvent("animation-complete");
+
           continue;
         }
+
+        if (state.animation_update) {
+          const name = cfg_anim.frames[0];
+          const frame_0 = sprite_sheet.frames[name];
+          if (frame_0) {
+            entity.fireEvent("update-frame", { frame: 0 });
+            entity.fireEvent("update-sprite", { frame_data: frame_0 });
+          }
+
+          entity.fireEvent("animation-complete");
+
+          continue;
+        }
+
         const delta_in_secs = dt / 1000;
         entity.fireEvent("update-time", { time: state.time + delta_in_secs });
         const frame_duration = 1 / cfg_anim.frame_rate;
-        let idx = Math.floor(state.time / frame_duration);
+        let idx = Math.floor(
+          (state.time % (cfg_anim.frames.length / frame_duration)) /
+            frame_duration
+        );
         if (idx >= cfg_anim.frames.length) {
           if (cfg_anim.loop) {
             entity.fireEvent("update-time", {
-              time: (state.time % cfg_anim.frames.length) * frame_duration,
+              time: state.time % (cfg_anim.frames.length * frame_duration),
             });
           } else {
             idx = cfg_anim.frames.length - 1;
@@ -61,9 +81,10 @@ export class AnimationSystem extends System {
         }
 
         if (idx !== state.frame) {
-          entity.fireEvent("update-frame", { frame: idx });
           const frame_data = sprite_sheet.frames[cfg_anim.frames[idx]];
+          // console.log(frame_data);
           if (frame_data) {
+            entity.fireEvent("update-frame", { frame: idx });
             entity.fireEvent("update-sprite", { frame_data });
           }
         }
