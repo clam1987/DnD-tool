@@ -35,7 +35,7 @@ export class RenderSystem extends System {
       const { id, renderable, position } = entity;
       if (!this.rendered.has(id) && !this.renderable.updated) {
         if (entity?.spriteLoader) {
-          const asset = this.asset_manager.get(entity.spriteLoader.name);
+          const asset = this.asset_manager.get(entity.spriteLoader.spritesheet);
           if (asset) {
             const { texture, frames } = asset;
             entity.fireEvent("create-object", {

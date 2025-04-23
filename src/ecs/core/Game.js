@@ -8,6 +8,7 @@ import {
   MovementSystem,
   CameraSystem,
   LightSystem,
+  AnimationSystem,
 } from "../systems";
 import { SceneManager, InputManager, AssetLoaderManager } from "../managers";
 
@@ -60,6 +61,7 @@ export default class Game {
     this.systems.set("movementSystem", new MovementSystem(this));
     this.systems.set("cameraSystem", new CameraSystem(this));
     this.systems.set("lightSystem", new LightSystem(this));
+    this.systems.set("animationSystem", new AnimationSystem(this));
   }
 
   initializeManagers() {

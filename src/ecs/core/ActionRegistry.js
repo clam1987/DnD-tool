@@ -89,25 +89,32 @@ export function registerDefaultActions() {
     }
 
     const vector = entity.velocity.vector;
-    const speed = entity.velocity.speed / 1000;
+    const speed = entity.velocity.speed / 3000;
     vector.set(0, 0, 0);
 
+    let direction;
     for (const action of payload.directions) {
       if (actions.includes(action)) {
         switch (action) {
           case MOVE_FORWARD:
             if (movement_plane === "2d") vector.y += speed;
             else vector.z -= speed;
+            direction = "back";
             break;
           case MOVE_BACKWARD:
             if (movement_plane === "2d") vector.y -= speed;
             else vector.z += speed;
+            direction = "front";
             break;
           case MOVE_LEFT:
             vector.x -= speed;
+            direction = "left";
             break;
           case MOVE_RIGHT:
             vector.x += speed;
+            direction = "right";
+            break;
+          default:
             break;
         }
       }
@@ -115,6 +122,13 @@ export function registerDefaultActions() {
     // Normalize vector to prevent faster diagonal movement
     if (vector.lengthSq() > 0) {
       vector.normalize().multiplyScalar(speed);
+      if (direction) {
+        entity.fireEvent("update-direction", { direction });
+        entity.fireEvent("update-current", { current: `${direction}_walk` });
+      }
+    } else {
+      entity.fireEvent("update-current", { current: "idle" });
+      vector.set(0, 0, 0);
     }
   });
 }

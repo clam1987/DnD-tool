@@ -148,4 +148,20 @@ export class Renderable extends Component {
 
     parent_group.add(text_mesh);
   }
+
+  onUpdateSprite(evt) {
+    const { frame_data, dt } = evt.data;
+    if (!frame_data || !this.group) return;
+    const { frame } = frame_data;
+    const texture = this.group.children[0].material.map;
+    const texture_w = texture.image.width;
+    const texture_h = texture.image.height;
+
+    texture.repeat.set(frame.w / texture_w, frame.h / texture_h);
+    texture.offset.set(
+      frame.x / texture_w,
+      1 - (frame.y + frame.h) / texture_h
+    );
+    evt.handle();
+  }
 }

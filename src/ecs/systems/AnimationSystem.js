@@ -1,0 +1,73 @@
+import System from "../core/System";
+import { AnimationState, Renderable } from "../components";
+
+export class AnimationSystem extends System {
+  constructor(game) {
+    super(game);
+
+    this.game = game;
+    this.asset_manager = null;
+    this.config_animations = game.config.data.assets.animations;
+    this.animations = game.world.world.createQuery({
+      all: [Renderable, AnimationState],
+    })._cache;
+  }
+
+  update(dt) {
+    if (this.asset_manager === null) {
+      this.asset_manager = this.game.managers.get("assetLoaderManager");
+    } else {
+      for (const entity of this.animations) {
+        const sprite_sheet = this.asset_manager.get(
+          entity.spriteLoader.spritesheet
+        );
+
+        const state = entity.animationState;
+        const cfg_anim = this.config_animations[state.current];
+
+        if (!cfg_anim || !sprite_sheet) continue;
+
+        // Special-case logic for idle animations
+        if (state.current === "idle") {
+          const { direction, previous_animation } = state;
+          const name = `${entity.spriteLoader.name}-${direction}`;
+
+          if (
+            previous_animation.current !== "idle" ||
+            previous_animation.direction !== direction
+          ) {
+            const frame = sprite_sheet.frames[name];
+            if (frame) {
+              entity.fireEvent("update-sprite", { frame_data: frame });
+              entity.fireEvent("update-current", { current: "idle" });
+              entity.fireEvent("update-direction", { direction });
+            }
+          }
+          continue;
+        }
+        const delta_in_secs = dt / 1000;
+        entity.fireEvent("update-time", { time: state.time + delta_in_secs });
+        const frame_duration = 1 / cfg_anim.frame_rate;
+        let idx = Math.floor(state.time / frame_duration);
+        if (idx >= cfg_anim.frames.length) {
+          if (cfg_anim.loop) {
+            entity.fireEvent("update-time", {
+              time: (state.time % cfg_anim.frames.length) * frame_duration,
+            });
+          } else {
+            idx = cfg_anim.frames.length - 1;
+            continue;
+          }
+        }
+
+        if (idx !== state.frame) {
+          entity.fireEvent("update-frame", { frame: idx });
+          const frame_data = sprite_sheet.frames[cfg_anim.frames[idx]];
+          if (frame_data) {
+            entity.fireEvent("update-sprite", { frame_data });
+          }
+        }
+      }
+    }
+  }
+}

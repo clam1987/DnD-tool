@@ -18,3 +18,4 @@ export { Camera } from "./Camera";
 export { Light } from "./Light";
 export { Rotation } from "./Rotation";
 export { EditorCameraControls } from "./EditorCameraControls";
+export { AnimationState } from "./AnimationState";
