@@ -27,6 +27,7 @@ export class AnimationState extends Component {
       };
       this.current = current;
       this.time = 0;
+      this.frame = 0;
     }
     evt.handle();
   }

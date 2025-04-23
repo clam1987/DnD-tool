@@ -60,7 +60,7 @@ export class InputActionSystem extends System {
 
   handleInputs(dt) {
     const actions = this.input_manager.getActiveActions();
-    if (actions.length < 0) {
+    if (actions.length === 0) {
       for (const entity of this.player) {
         entity.fireEvent("update-current", { current: "idle" });
         entity.fireEvent("update-direction", {

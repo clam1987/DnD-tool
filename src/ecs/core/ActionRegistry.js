@@ -89,7 +89,7 @@ export function registerDefaultActions() {
     }
 
     const vector = entity.velocity.vector;
-    const speed = entity.velocity.speed / 3000;
+    const speed = entity.velocity.speed / (entity.velocity.speed * 1000);
     vector.set(0, 0, 0);
 
     let direction;
