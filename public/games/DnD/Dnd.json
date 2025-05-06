@@ -12,7 +12,6 @@
           "HelloWorld",
           "Back_Button",
           "Test",
-          "Sprite",
           "Anime"
         ],
         "systems": []
@@ -105,7 +104,7 @@
       ],
       "models": [
         {
-          "model_path": "/assets/models/miyako_gltf/scene.gltf",
+          "model_path": "/assets/models/sayuri_gltf/Sayuri.glb",
           "model_name": "anime",
           "scene": "GameScene"
         }
@@ -316,45 +315,31 @@
         ]
       },
       {
-        "name": "Sprite",
+        "name": "Anime",
         "components": [
           {
             "type": "Position",
             "properties": {
-              "x": 2,
-              "y": -2,
-              "z": 1
+              "x": -4,
+              "y": -1,
+              "z": 0
             }
           },
           {
             "type": "Renderable",
             "properties": {
-              "type": "sprite",
+              "type": "gltf",
               "layer": "ui"
             }
           },
           {
-            "type": "SpriteLoader",
+            "type": "GltfLoader",
             "properties": {
-              "frame": "lufia-front",
-              "name": "lufia",
-              "spritesheet": "lufia_spritesheet"
+              "asset_name": "anime"
             }
           },
           {
-            "type": "Player",
-            "properties": {
-              "speed": 3
-            }
-          },
-          {
-            "type": "AnimationState",
-            "properties": {
-              "current": "idle",
-              "frame": 0,
-              "time": 0,
-              "direction": "front"
-            }
+            "type": "Player"
           },
           {
             "type": "ActionHandler",
@@ -373,32 +358,6 @@
                   "type": "KEYDOWN"
                 }
               ]
-            }
-          }
-        ]
-      },
-      {
-        "name": "Anime",
-        "components": [
-          {
-            "type": "Position",
-            "properties": {
-              "x": -4,
-              "y": -1,
-              "z": 0.665
-            }
-          },
-          {
-            "type": "Renderable",
-            "properties": {
-              "type": "gltf",
-              "layer": "ui"
-            }
-          },
-          {
-            "type": "GltfLoader",
-            "properties": {
-              "asset_name": "anime"
             }
           }
         ]

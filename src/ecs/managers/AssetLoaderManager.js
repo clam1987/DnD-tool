@@ -48,9 +48,9 @@ export class AssetLoaderManager extends Manager {
         rej
       );
     });
-    this.cache.set(name, gltf);
+    this.cache.set(name, { scene: gltf.scene, clips: gltf.animations });
 
-    return gltf;
+    return this.cache.get(name);
   }
 
   async loadAssets(config) {

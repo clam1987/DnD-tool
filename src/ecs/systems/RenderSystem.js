@@ -43,9 +43,13 @@ export class RenderSystem extends System {
               frames,
             });
           }
-        } else if (entity?.gltfLoader) {
+        } else if (entity?.gltfLoader && !this.rendered.has(id)) {
           const asset = this.asset_manager.get(entity.gltfLoader.asset_name);
-          entity.fireEvent("create-object", { model: asset });
+          entity.fireEvent("create-object", {
+            model: asset.scene,
+            clips: asset.clips,
+          });
+          entity.fireEvent("create-animation");
         } else {
           entity.fireEvent("create-object");
         }

@@ -21,16 +21,19 @@ export class AnimationState extends Component {
   onUpdateCurrent(evt) {
     const { current } = evt.data;
 
-    if (this.current !== current) {
-      this.previous_animation = {
-        ...this.previous_animation,
-        current: this.current,
-      };
-      this.current = current;
-      this.time = 0;
-      this.frame = 0;
-      this.animation_update = true;
+    if (this.entity.spriteLoader) {
+      if (this.current !== current) {
+        this.previous_animation = {
+          ...this.previous_animation,
+          current: this.current,
+        };
+        this.current = current;
+        this.time = 0;
+        this.frame = 0;
+        this.animation_update = true;
+      }
     }
+
     evt.handle();
   }
 

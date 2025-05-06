@@ -62,10 +62,14 @@ export class InputActionSystem extends System {
     const actions = this.input_manager.getActiveActions();
     if (actions.length === 0) {
       for (const entity of this.player) {
-        entity.fireEvent("update-current", { current: "idle" });
-        entity.fireEvent("update-direction", {
-          direction: entity.animationState.direction,
-        });
+        if (entity.spriteLoader) {
+          entity.fireEvent("update-current", { current: "idle" });
+          entity.fireEvent("update-direction", {
+            direction: entity.animationState.direction,
+          });
+        } else {
+          // entity.fireEvent("update-gltf-current", { current: "idle" });
+        }
       }
     } else {
       for (const entity of this.player) {

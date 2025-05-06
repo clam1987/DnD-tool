@@ -18,29 +18,38 @@ export const camelCase = (str: string) =>
     )
     .replace(/\s+/g, "");
 
-export const normalizeGLTF = (model: GLTF, desiredSize: number = 2): Group => {
-  const cloned_model: Group = model.scene.clone() as Group;
-  const box: Box3 = new Box3().setFromObject(cloned_model);
-  const size: Vector3 = new Vector3();
-  box.getSize(size);
+/**
+ * Normalize a loaded glTF scene *in place* by parenting it to a pivot group.
+ * @param {Group} model_scene - The glTF model.scene loaded by GLTFLoader.
+ * @param {number} desiredSize - The desired maximum dimension (world units).
+ * @returns {[Group, Group]} [pivot, model_scene]
+ */
+export function normalizeGLTF(model_scene: Group, desiredSize = 1) {
+  // 1. Create a pivot group
+  const pivot = new Group();
 
-  const max_dim: number = Math.max(size.x, size.y, size.z);
-  const scale_factor: number = desiredSize / max_dim;
+  // 2. Add the model scene under the pivot
+  pivot.add(model_scene);
 
-  cloned_model.scale.setScalar(scale_factor);
+  // 3. Measure the model_scene's bounding box
+  const box = new Box3().setFromObject(model_scene);
+  const size = box.getSize(new Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z);
 
-  const center: Vector3 = new Vector3();
-  box.getCenter(center);
-  cloned_model.position.sub(center);
+  // 4. Compute uniform scale factor
+  const scale = desiredSize / maxDim;
+  pivot.scale.setScalar(scale);
 
-  // Rotate the model to face the camera will delete this later
-  const rotation_degreesX = 10;
-  const rotationRadiansX = MathUtils.degToRad(rotation_degreesX);
-  const rotation_degreesY = 30;
-  const rotationRadiansY = MathUtils.degToRad(rotation_degreesY);
+  // 5. Recompute bounding box after scaling
+  const boxScaled = new Box3().setFromObject(model_scene);
+  const center = boxScaled.getCenter(new Vector3());
 
-  cloned_model.rotateY(rotationRadiansY);
-  cloned_model.rotateX(rotationRadiansX);
+  // 6. Center the model_scene within the pivot
+  model_scene.position.sub(center);
 
-  return cloned_model;
-};
+  // 7. Optional: Rotate the pivot so the model faces the camera
+  pivot.rotation.y = MathUtils.degToRad(30);
+  pivot.rotation.x = MathUtils.degToRad(10);
+
+  return [pivot, model_scene];
+}

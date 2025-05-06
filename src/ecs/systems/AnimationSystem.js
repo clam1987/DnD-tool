@@ -1,5 +1,5 @@
 import System from "../core/System";
-import { AnimationState, Renderable } from "../components";
+import { AnimationState, Renderable, GltfAnimation } from "../components";
 
 export class AnimationSystem extends System {
   constructor(game) {
@@ -8,8 +8,11 @@ export class AnimationSystem extends System {
     this.game = game;
     this.asset_manager = null;
     this.config_animations = game.config.data.assets.animations;
-    this.animations = game.world.world.createQuery({
+    this.sprite_animations = game.world.world.createQuery({
       all: [Renderable, AnimationState],
+    })._cache;
+    this.model_animations = game.world.world.createQuery({
+      all: [GltfAnimation],
     })._cache;
   }
 
@@ -17,7 +20,7 @@ export class AnimationSystem extends System {
     if (this.asset_manager === null) {
       this.asset_manager = this.game.managers.get("assetLoaderManager");
     } else {
-      for (const entity of this.animations) {
+      for (const entity of this.sprite_animations) {
         const sprite_sheet = this.asset_manager.get(
           entity.spriteLoader.spritesheet
         );
@@ -86,6 +89,14 @@ export class AnimationSystem extends System {
             entity.fireEvent("update-frame", { frame: idx });
             entity.fireEvent("update-sprite", { frame_data });
           }
+        }
+      }
+
+      for (const entity of this.model_animations) {
+        const animation = entity.gltfAnimation;
+        if (animation.mixer) {
+          const delta_in_secs = dt / 1000;
+          animation.mixer.update(delta_in_secs);
         }
       }
     }

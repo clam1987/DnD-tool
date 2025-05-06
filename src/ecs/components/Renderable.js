@@ -6,6 +6,7 @@ import {
   Mesh,
   PlaneGeometry,
 } from "three";
+import { GltfAnimation } from "./";
 import { normalizeGLTF } from "../../utils/utils";
 import { Text } from "troika-three-text";
 
@@ -41,8 +42,8 @@ export class Renderable extends Component {
         this.#displayText(this.entity.text.text, this.entity.style.css, group);
         break;
       case "gltf":
-        const { model } = evt.data;
-        this.#displayGLTF(model, group);
+        const { model, clips } = evt.data;
+        this.#displayGLTF(model, group, this.entity.size?.width || 4, clips);
         break;
       default:
         console.warn(`Unknown renderable type: ${this.type}`);
@@ -102,11 +103,13 @@ export class Renderable extends Component {
     parent_group.add(mesh);
   }
 
-  #displayGLTF(model, parent_group) {
+  #displayGLTF(model, parent_group, width, clips) {
     if (model === null) return;
 
-    const normalized_model = normalizeGLTF(model, 2);
-    parent_group.add(normalized_model);
+    const [pivot] = normalizeGLTF(model, width);
+    parent_group.add(pivot);
+
+    this.entity.add(GltfAnimation, { clips, mixer_root: pivot });
   }
 
   #displayText(text, style, parent_group) {

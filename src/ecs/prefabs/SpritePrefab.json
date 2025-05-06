@@ -1,0 +1,62 @@
+{
+  "name": "Sprite",
+  "components": [
+    {
+      "type": "Position",
+      "properties": {
+        "x": 2,
+        "y": -2,
+        "z": 1
+      }
+    },
+    {
+      "type": "Renderable",
+      "properties": {
+        "type": "sprite",
+        "layer": "ui"
+      }
+    },
+    {
+      "type": "SpriteLoader",
+      "properties": {
+        "frame": "lufia-front",
+        "name": "lufia",
+        "spritesheet": "lufia_spritesheet"
+      }
+    },
+    {
+      "type": "Player",
+      "properties": {
+        "speed": 3
+      }
+    },
+    {
+      "type": "AnimationState",
+      "properties": {
+        "current": "idle",
+        "frame": 0,
+        "time": 0,
+        "direction": "front"
+      }
+    },
+    {
+      "type": "ActionHandler",
+      "properties": {
+        "actions": [
+          {
+            "action": "movement",
+            "payload": {
+              "directions": [
+                "MOVE_FORWARD",
+                "MOVE_BACKWARD",
+                "MOVE_LEFT",
+                "MOVE_RIGHT"
+              ]
+            },
+            "type": "KEYDOWN"
+          }
+        ]
+      }
+    }
+  ]
+}

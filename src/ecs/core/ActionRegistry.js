@@ -119,12 +119,18 @@ export function registerDefaultActions() {
         }
       }
     }
+
     // Normalize vector to prevent faster diagonal movement
     if (vector.lengthSq() > 0) {
       vector.normalize().multiplyScalar(speed);
       if (direction) {
+        if (entity.spriteLoader) {
+          entity.fireEvent("update-current", { current: `${direction}_walk` });
+        } else {
+          const clip_name = "Armature|mixamo.com|Layer0";
+          entity.fireEvent("update-gltf-current", { current: clip_name });
+        }
         entity.fireEvent("update-direction", { direction });
-        entity.fireEvent("update-current", { current: `${direction}_walk` });
       }
     } else {
       entity.fireEvent("update-current", { current: "idle" });
