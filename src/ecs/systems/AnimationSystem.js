@@ -1,5 +1,6 @@
 import System from "../core/System";
 import { AnimationState, Renderable, GltfAnimation } from "../components";
+import { LoopOnce } from "three";
 
 export class AnimationSystem extends System {
   constructor(game) {
@@ -8,6 +9,7 @@ export class AnimationSystem extends System {
     this.game = game;
     this.asset_manager = null;
     this.config_animations = game.config.data.assets.animations;
+    this._listeners = new WeakMap();
     this.sprite_animations = game.world.world.createQuery({
       all: [Renderable, AnimationState],
     })._cache;
@@ -94,10 +96,9 @@ export class AnimationSystem extends System {
 
       for (const entity of this.model_animations) {
         const animation = entity.gltfAnimation;
-        if (animation.mixer) {
-          const delta_in_secs = dt / 1000;
-          animation.mixer.update(delta_in_secs);
-        }
+        if (!animation.mixer) continue;
+        const delta_in_secs = dt / 1000;
+        animation.mixer.update(delta_in_secs);
       }
     }
   }

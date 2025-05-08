@@ -45,11 +45,20 @@ export class RenderSystem extends System {
           }
         } else if (entity?.gltfLoader && !this.rendered.has(id)) {
           const asset = this.asset_manager.get(entity.gltfLoader.asset_name);
+          const clip_name =
+            this.game.config.data.assets.animations[
+              entity.gltfLoader.asset_name
+            ];
           entity.fireEvent("create-object", {
             model: asset.scene,
             clips: asset.clips,
           });
           entity.fireEvent("create-animation");
+          entity.fireEvent("update-gltf-current", {
+            state: "idle",
+            clip_name: clip_name.idle.clip,
+            loop: clip_name.idle.loop,
+          });
         } else {
           entity.fireEvent("create-object");
         }

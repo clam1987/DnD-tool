@@ -20,79 +20,15 @@
     "systems": [],
     "assets": {
       "animations": {
-        "idle": {
-          "frames": ["lufia-front", "lufia-back", "lufia-left", "lufia-right"],
-          "frame_rate": 4,
-          "loop": false,
-          "current_frame": 0,
-          "time_since_last_frame": 0
-        },
-        "back_walk": {
-          "frames": [
-            "lufia-back-walk.000",
-            "lufia-back-walk.001",
-            "lufia-back-walk.002",
-            "lufia-back-walk.003",
-            "lufia-back-walk.004",
-            "lufia-back-walk.005",
-            "lufia-back-walk.006",
-            "lufia-back-walk.007"
-          ],
-          "frame_rate": 8,
-          "loop": true,
-          "current_frame": 0,
-          "time_since_last_frame": 0
-        },
-        "front_walk": {
-          "frames": [
-            "lufia-front-walk.000",
-            "lufia-front-walk.001",
-            "lufia-front-walk.002",
-            "lufia-front-walk.003",
-            "lufia-front-walk.004",
-            "lufia-front-walk.005",
-            "lufia-front-walk.006",
-            "lufia-front-walk.007"
-          ],
-          "frame_rate": 8,
-          "loop": true,
-          "current_frame": 0,
-          "time_since_last_frame": 0
-        },
-        "left_walk": {
-          "frames": [
-            "lufia-left-walk.000",
-            "lufia-left-walk.001",
-            "lufia-left-walk.002",
-            "lufia-left-walk.003",
-            "lufia-left-walk.004",
-            "lufia-left-walk.005",
-            "lufia-left-walk.006",
-            "lufia-left-walk.007"
-          ],
-          "frame_rate": 8,
-          "loop": true,
-          "current_frame": 0,
-          "time_since_last_frame": 0
-        },
-        "right_walk": {
-          "frames": [
-            "lufia-right-walk.000",
-            "lufia-right-walk.001",
-            "lufia-right-walk.002",
-            "lufia-right-walk.003",
-            "lufia-right-walk.004",
-            "lufia-right-walk.005",
-            "lufia-right-walk.006",
-            "lufia-right-walk.007"
-          ],
-          "frame_rate": 8,
-          "loop": true,
-          "current_frame": 0,
-          "time_since_last_frame": 0
+        "anime": {
+          "start": { "clip": "Idle", "loop": false },
+          "walk_forward": { "clip": "Walk_Forward", "loop": true },
+          "walk_backward": { "clip": "Walk_Backward", "loop": true },
+          "walk_left": { "clip": "Walk_Left", "loop": true },
+          "walk_right": { "clip": "Walk_Right", "loop": true },
+          "idle": { "clip": "Idle", "loop": true }
         }
       },
-      "idle_animations": {},
       "images": [],
       "sprites": [
         {

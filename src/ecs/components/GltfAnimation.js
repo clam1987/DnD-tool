@@ -1,5 +1,5 @@
 import { Component } from "geotic";
-import { AnimationMixer, AnimationAction } from "three";
+import { AnimationMixer, LoopOnce, LoopRepeat } from "three";
 
 export class GltfAnimation extends Component {
   constructor({ clips, mixer_root }) {
@@ -9,7 +9,8 @@ export class GltfAnimation extends Component {
     this.mixer_root = mixer_root ?? null;
     this.mixer = null;
     this.actions = {};
-    this.current = null;
+    this.current_clip = null;
+    this.state = null;
   }
 
   onCreateAnimation(evt) {
@@ -22,8 +23,6 @@ export class GltfAnimation extends Component {
 
     for (const clip of this.clips) {
       const action = this.mixer.clipAction(clip);
-      action.enabled = true;
-      action.setEffectiveWeight(1);
       action.paused = true;
       this.actions[clip.name] = action;
     }
@@ -32,23 +31,30 @@ export class GltfAnimation extends Component {
   }
 
   onUpdateGltfCurrent(evt) {
-    const { current } = evt.data;
-    this.play(current);
+    const { state, clip_name, loop } = evt.data;
+    this.playClip(state, clip_name, loop);
     evt.handle();
   }
 
-  play(name) {
-    const next = this.actions[name];
-    if (!next) {
-      console.warn(`GltfAnimation: clip "${name}" not found`);
+  playClip(state, clip_name, loop) {
+    const action = this.actions[clip_name];
+    if (this.state === state && this.current_clip === clip_name) return;
+
+    if (!action) {
+      console.warn(`GltfAnimation: clip "${clip_name}" not found`);
       return;
     }
 
-    if (this.current && this.actions[this.current]) {
-      this.actions[this.current].fadeOut(0.2);
+    if (this.current_clip && this.actions[this.current_clip]) {
+      this.actions[this.current_clip].fadeOut(0.2);
     }
 
-    next.reset().fadeIn(1).play();
-    this.current = name;
+    action
+      .reset()
+      .setLoop(loop ? LoopRepeat : LoopOnce, Infinity)
+      .fadeIn(0.2)
+      .play();
+    this.current_clip = clip_name;
+    this.state = state;
   }
 }

@@ -124,17 +124,38 @@ export function registerDefaultActions() {
     if (vector.lengthSq() > 0) {
       vector.normalize().multiplyScalar(speed);
       if (direction) {
-        if (entity.spriteLoader) {
+        if (movement_plane === "2d") {
           entity.fireEvent("update-current", { current: `${direction}_walk` });
         } else {
-          const clip_name = "Armature|mixamo.com|Layer0";
-          entity.fireEvent("update-gltf-current", { current: clip_name });
+          const anim_cfg =
+            input_manager.game.config.data.assets.animations[
+              entity.gltfLoader.asset_name
+            ];
+          // Mapping from 2d movement to 3d
+          const animation_map = {
+            back: "walk_forward",
+            front: "walk_backward",
+            left: "walk_left",
+            right: "walk_right",
+          };
+          const is_moving = actions.length > 0;
+          if (is_moving) {
+            if (entity.gltfAnimation.state === "idle") {
+              entity.fireEvent("update-gltf-current", {
+                state: animation_map[direction],
+                clip_name: anim_cfg[animation_map[direction]].clip,
+                loop: anim_cfg[animation_map[direction]].loop,
+              });
+            }
+          }
         }
         entity.fireEvent("update-direction", { direction });
       }
     } else {
-      entity.fireEvent("update-current", { current: "idle" });
-      vector.set(0, 0, 0);
+      if (movement_plane === "2d") {
+        entity.fireEvent("update-current", { current: "idle" });
+        vector.set(0, 0, 0);
+      }
     }
   });
 }

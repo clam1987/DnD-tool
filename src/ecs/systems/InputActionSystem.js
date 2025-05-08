@@ -1,5 +1,11 @@
 import System from "../core/System";
-import { KEYDOWN } from "../../utils/actions";
+import {
+  KEYDOWN,
+  MOVE_BACKWARD,
+  MOVE_FORWARD,
+  MOVE_LEFT,
+  MOVE_RIGHT,
+} from "../../utils/actions";
 import { Player, Velocity, ActionHandler } from "../components";
 import { Vector3 } from "three";
 
@@ -68,7 +74,15 @@ export class InputActionSystem extends System {
             direction: entity.animationState.direction,
           });
         } else {
-          // entity.fireEvent("update-gltf-current", { current: "idle" });
+          const animation =
+            this.game.config.data.assets.animations[
+              entity.gltfLoader.asset_name
+            ];
+          entity.fireEvent("update-gltf-current", {
+            state: "idle",
+            clip_name: animation.idle.clip,
+            loop: animation.idle.loop,
+          });
         }
       }
     } else {
