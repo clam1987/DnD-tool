@@ -1,0 +1,303 @@
+{
+  "name": "DnD",
+  "total_players": 6,
+  "data": {
+    "scenes": [
+      {
+        "name": "GameScene",
+        "prefabs": [
+          "MainDirectionalLight",
+          "AmbientLight",
+          "Camera3d",
+          "HelloWorld",
+          "Back_Button",
+          "Test",
+          "Anime"
+        ],
+        "systems": []
+      }
+    ],
+    "systems": [],
+    "assets": {
+      "animations": {
+        "anime": {
+          "start": { "clip": "Idle", "loop": false },
+          "walk_forward": { "clip": "Walk_Forward", "loop": true },
+          "walk_backward": { "clip": "Walk_Backward", "loop": true },
+          "walk_left": { "clip": "Walk_Left", "loop": true },
+          "walk_right": { "clip": "Walk_Right", "loop": true },
+          "idle": { "clip": "Idle", "loop": true }
+        }
+      },
+      "images": [],
+      "sprites": [
+        {
+          "sprite_path": "/assets/sprites/lufia_spritesheet.png",
+          "sprite_name": "lufia_spritesheet",
+          "json_path": "/assets/sprites/lufia.json",
+          "scene": "GameScene"
+        }
+      ],
+      "models": [
+        {
+          "model_path": "/assets/models/sayuri_gltf/Sayuri.glb",
+          "model_name": "anime",
+          "scene": "GameScene"
+        }
+      ],
+      "tilemaps": []
+    },
+    "custom_scripts": ["changeColor"],
+    "actions": {
+      "MOVE_FORWARD": [["KeyW"]],
+      "MOVE_BACKWARD": [["KeyS"]],
+      "MOVE_LEFT": [["KeyA"]],
+      "MOVE_RIGHT": [["KeyD"]],
+      "camera-orbit": ["MouseRight"],
+      "camera-pan": ["MouseMiddle"],
+      "camera-zoom": ["Wheel"]
+    },
+    "prefabs": [
+      {
+        "name": "MainDirectionalLight",
+        "components": [
+          {
+            "type": "Position",
+            "properties": {
+              "x": 10,
+              "y": 10,
+              "z": 10
+            }
+          },
+          {
+            "type": "Light",
+            "properties": {
+              "type": "directional",
+              "color": "#ffffff",
+              "intensity": 1,
+              "castShadow": true
+            }
+          },
+          {
+            "type": "Rotation",
+            "properties": {
+              "x": -45,
+              "y": 45,
+              "z": 0
+            }
+          }
+        ]
+      },
+      {
+        "name": "AmbientLight",
+        "components": [
+          {
+            "type": "Light",
+            "properties": {
+              "type": "ambient",
+              "color": "#404040",
+              "intensity": 2
+            }
+          }
+        ]
+      },
+      {
+        "name": "Camera3d",
+        "components": [
+          {
+            "type": "Camera",
+            "properties": {
+              "type": "perspective",
+              "fov": 75,
+              "near": 0.1,
+              "far": 1000
+            }
+          },
+          {
+            "type": "Position",
+            "properties": {
+              "x": 0,
+              "y": 0,
+              "z": 5
+            }
+          },
+          {
+            "type": "Rotation",
+            "properties": {
+              "x": -30,
+              "y": 0,
+              "z": 0
+            }
+          }
+        ]
+      },
+      {
+        "name": "HelloWorld",
+        "components": [
+          {
+            "type": "Text",
+            "properties": {
+              "text": "Game Engine DnD"
+            }
+          },
+          {
+            "type": "Style",
+            "properties": {
+              "css": {
+                "fontFamily": "/assets/fonts/Sweet_Candies.otf",
+                "color": "#ffffff",
+                "fontSize": 1,
+                "depth": 0.1
+              }
+            }
+          },
+          {
+            "type": "Position",
+            "properties": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "text",
+              "layer": "ui"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Back_Button",
+        "components": [
+          {
+            "type": "Text",
+            "properties": {
+              "text": "Back"
+            }
+          },
+          {
+            "type": "Position",
+            "properties": {
+              "x": 0,
+              "y": -1,
+              "z": 0
+            }
+          },
+          {
+            "type": "Button",
+            "properties": {
+              "style": {}
+            }
+          },
+          {
+            "type": "Style",
+            "properties": {
+              "css": {
+                "backgroundColor": "#2fc5f6",
+                "fontFamily": "/assets/fonts/Sweet_Candies.otf",
+                "color": "#ffffff",
+                "fontSize": 0.5,
+                "depth": 0.1
+              }
+            }
+          },
+          {
+            "type": "Size",
+            "properties": {
+              "width": 2,
+              "height": 1
+            }
+          },
+          {
+            "type": "Interactive"
+          },
+          {
+            "type": "ActionHandler",
+            "properties": {
+              "actions": [
+                {
+                  "action": "changeURL",
+                  "payload": { "url": "/" },
+                  "type": "CLICK"
+                },
+                {
+                  "action": "changeColor",
+                  "payload": {
+                    "color": "#F0F6FC",
+                    "backgroundColor": "#80A0FA"
+                  },
+                  "type": "MOUSEENTER"
+                },
+                {
+                  "action": "changeColor",
+                  "payload": {
+                    "color": "#FFFFFF",
+                    "backgroundColor": "#2FC5F6"
+                  },
+                  "type": "MOUSELEAVE"
+                }
+              ]
+            }
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "mesh",
+              "layer": "ui"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Anime",
+        "components": [
+          {
+            "type": "Position",
+            "properties": {
+              "x": -4,
+              "y": -1,
+              "z": 0
+            }
+          },
+          {
+            "type": "Renderable",
+            "properties": {
+              "type": "gltf",
+              "layer": "ui"
+            }
+          },
+          {
+            "type": "GltfLoader",
+            "properties": {
+              "asset_name": "anime"
+            }
+          },
+          {
+            "type": "Player"
+          },
+          {
+            "type": "ActionHandler",
+            "properties": {
+              "actions": [
+                {
+                  "action": "movement",
+                  "payload": {
+                    "directions": [
+                      "MOVE_FORWARD",
+                      "MOVE_BACKWARD",
+                      "MOVE_LEFT",
+                      "MOVE_RIGHT"
+                    ]
+                  },
+                  "type": "KEYDOWN"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -110,7 +110,8 @@
               "type": "perspective",
               "fov": 75,
               "near": 0.1,
-              "far": 1000
+              "far": 1000,
+              "zoom": 5
             }
           },
           {
@@ -128,42 +129,13 @@
               "y": 0,
               "z": 0
             }
-          }
-        ]
-      },
-      {
-        "name": "HelloWorld",
-        "components": [
-          {
-            "type": "Text",
-            "properties": {
-              "text": "Game Engine DnD"
-            }
           },
           {
-            "type": "Style",
+            "type": "CameraFollow",
             "properties": {
-              "css": {
-                "fontFamily": "/assets/fonts/Sweet_Candies.otf",
-                "color": "#ffffff",
-                "fontSize": 1,
-                "depth": 0.1
-              }
-            }
-          },
-          {
-            "type": "Position",
-            "properties": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            }
-          },
-          {
-            "type": "Renderable",
-            "properties": {
-              "type": "text",
-              "layer": "ui"
+              "target": "Anime",
+              "offset": { "x": 0, "y": 1.25, "z": -5 },
+              "damping": 5
             }
           }
         ]
@@ -256,8 +228,16 @@
           {
             "type": "Position",
             "properties": {
-              "x": -4,
-              "y": -1,
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          {
+            "type": "Rotation",
+            "properties": {
+              "x": 0,
+              "y": 0,
               "z": 0
             }
           },

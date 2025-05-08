@@ -98,20 +98,20 @@ export function registerDefaultActions() {
         switch (action) {
           case MOVE_FORWARD:
             if (movement_plane === "2d") vector.y += speed;
-            else vector.z -= speed;
+            else vector.z += speed;
             direction = "back";
             break;
           case MOVE_BACKWARD:
             if (movement_plane === "2d") vector.y -= speed;
-            else vector.z += speed;
+            else vector.z -= speed;
             direction = "front";
             break;
           case MOVE_LEFT:
-            vector.x -= speed;
+            vector.x += speed;
             direction = "left";
             break;
           case MOVE_RIGHT:
-            vector.x += speed;
+            vector.x -= speed;
             direction = "right";
             break;
           default:

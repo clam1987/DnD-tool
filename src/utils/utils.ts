@@ -48,8 +48,8 @@ export function normalizeGLTF(model_scene: Group, desiredSize = 1) {
   model_scene.position.sub(center);
 
   // 7. Optional: Rotate the pivot so the model faces the camera
-  pivot.rotation.y = MathUtils.degToRad(30);
-  pivot.rotation.x = MathUtils.degToRad(10);
+  // pivot.rotation.y = MathUtils.degToRad(30);
+  // pivot.rotation.x = MathUtils.degToRad(10);
 
   return [pivot, model_scene];
 }

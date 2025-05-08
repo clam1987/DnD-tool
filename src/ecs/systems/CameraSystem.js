@@ -1,6 +1,6 @@
-import { PerspectiveCamera, OrthographicCamera } from "three";
+import { PerspectiveCamera, OrthographicCamera, Group } from "three";
 import System from "../core/System";
-import { Camera, Position } from "../components";
+import { Camera } from "../components";
 
 export class CameraSystem extends System {
   constructor(game) {
@@ -8,6 +8,7 @@ export class CameraSystem extends System {
 
     this.game = game;
     this.scene_manager = null;
+    this._initialized = false;
     this.cameras = game.world.world.createQuery({
       all: [Camera],
     })._cache;
@@ -18,20 +19,20 @@ export class CameraSystem extends System {
       this.scene_manager = this.game.managers.get("sceneManager");
     } else {
       for (const entity of this.cameras) {
-        const { fov, near, far, zoom } = entity.camera;
+        const { fov, near, far, zoom, type } = entity.camera;
         const aspect = window.innerWidth / window.innerHeight;
         let camera = null;
 
-        if (entity.camera.type === "perspective") {
+        if (type === "perspective") {
           camera = new PerspectiveCamera(fov, aspect, near, far);
         } else {
           const height = window.innerHeight / zoom;
           const width = window.innerWidth / zoom;
           camera = new OrthographicCamera(
-            -width / 2,
-            width / 2,
-            height / 2,
-            -height / 2,
+            -width / 2 / zoom,
+            width / 2 / zoom,
+            height / 2 / zoom,
+            -height / 2 / zoom,
             near,
             far
           );
@@ -44,6 +45,8 @@ export class CameraSystem extends System {
           const { x, y, z } = entity.position.coords;
           camera.position.set(x, y, z);
         }
+
+        this._initialized = true;
       }
     }
   }

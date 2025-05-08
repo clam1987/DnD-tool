@@ -21,6 +21,8 @@ export class InputManager extends Manager {
     this.mouse = {
       x: 0,
       y: 0,
+      dx: 0,
+      dy: 0,
       left_clicked: false,
       right_clicked: false,
       middle_clicked: false,
@@ -43,10 +45,23 @@ export class InputManager extends Manager {
   }
 
   initialize(canvas) {
+    let last_x = null,
+      last_y = null;
+    canvas.addEventListener("contextmenu", (e) => e.preventDefault());
     canvas.addEventListener("mousemove", (evt) => {
       const rect = canvas.getBoundingClientRect();
-      this.mouse.x = ((evt.clientX - rect.left) / rect.width) * 2 - 1;
-      this.mouse.y = -((evt.clientY - rect.top) / rect.height) * 2 + 1;
+      const nx = ((evt.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = -((evt.clientY - rect.top) / rect.height) * 2 + 1;
+
+      if (last_x !== null) {
+        this.mouse.dx = nx - last_x;
+        this.mouse.dy = ny - last_y;
+      }
+
+      last_x = nx;
+      last_y = ny;
+      this.mouse.x = nx;
+      this.mouse.y = ny;
     });
 
     canvas.addEventListener("click", (evt) => {

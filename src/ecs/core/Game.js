@@ -9,6 +9,8 @@ import {
   CameraSystem,
   LightSystem,
   AnimationSystem,
+  CameraFollowSystem,
+  CameraOrbitSystem,
 } from "../systems";
 import { SceneManager, InputManager, AssetLoaderManager } from "../managers";
 
@@ -52,16 +54,18 @@ export default class Game {
   }
 
   initializeSystems() {
-    this.systems.set("renderSystem", new RenderSystem(this));
     this.systems.set(
       "interactiveActionSystem",
       new InteractiveActionSystem(this)
     );
     this.systems.set("inputActionSystem", new InputActionSystem(this));
-    this.systems.set("movementSystem", new MovementSystem(this));
     this.systems.set("cameraSystem", new CameraSystem(this));
     this.systems.set("lightSystem", new LightSystem(this));
+    this.systems.set("cameraOrbitSystem", new CameraOrbitSystem(this));
+    this.systems.set("cameraFollowSystem", new CameraFollowSystem(this));
+    this.systems.set("movementSystem", new MovementSystem(this));
     this.systems.set("animationSystem", new AnimationSystem(this));
+    this.systems.set("renderSystem", new RenderSystem(this));
   }
 
   initializeManagers() {

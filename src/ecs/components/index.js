@@ -20,3 +20,4 @@ export { Rotation } from "./Rotation";
 export { EditorCameraControls } from "./EditorCameraControls";
 export { AnimationState } from "./AnimationState";
 export { GltfAnimation } from "./GltfAnimation";
+export { CameraFollow } from "./CameraFollow";

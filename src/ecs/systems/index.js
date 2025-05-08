@@ -5,3 +5,5 @@ export { InputActionSystem } from "./InputActionSystem";
 export { CameraSystem } from "./CameraSystem";
 export { LightSystem } from "./LightSystem";
 export { AnimationSystem } from "./AnimationSystem";
+export { CameraFollowSystem } from "./CameraFollowSystem";
+export { CameraOrbitSystem } from "./CameraOrbitSystem";
