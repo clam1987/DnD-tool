@@ -10,7 +10,11 @@ export class Rotation extends Component {
 
   onUpdateRotation(evt) {
     const { y } = evt.data;
-    this.euler.y = y;
+    const current_y = this.euler.y;
+    const alpha = 0.1;
+    const delta_y = y - current_y;
+    this.euler.y += delta_y * alpha;
+
     this.entity.renderable?.group.rotation.copy(this.euler);
   }
 }

@@ -83,9 +83,6 @@ export class InputActionSystem extends System {
             clip_name: animation.idle.clip,
             loop: animation.idle.loop,
           });
-          const mouse = this.input_manager.getMouse();
-          mouse.dx = 0;
-          mouse.dy = 0;
         }
       }
     } else {

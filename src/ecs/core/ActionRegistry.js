@@ -75,6 +75,8 @@ export function registerDefaultActions() {
 
   ActionRegistry.register("movement", (entity, payload, { input_manager }) => {
     const actions = input_manager.getActiveActions();
+    const camera = input_manager.game.managers.get("sceneManager").getCamera();
+
     const movement_plane = entity.spriteLoader
       ? "2d"
       : entity.gltfLoader
@@ -88,6 +90,15 @@ export function registerDefaultActions() {
       });
     }
 
+    const camera_forward = new Vector3(0, 0, -1)
+      .applyQuaternion(camera.quaternion)
+      .setY(0)
+      .normalize();
+    const camera_right = new Vector3(1, 0, 0)
+      .applyQuaternion(camera.quaternion)
+      .setY(0)
+      .normalize();
+
     const vector = entity.velocity.vector;
     const speed = entity.velocity.speed / (entity.velocity.speed * 1000);
     vector.set(0, 0, 0);
@@ -98,20 +109,22 @@ export function registerDefaultActions() {
         switch (action) {
           case MOVE_FORWARD:
             if (movement_plane === "2d") vector.y += speed;
-            else vector.z += speed;
+            else vector.add(camera_forward);
             direction = "back";
             break;
           case MOVE_BACKWARD:
             if (movement_plane === "2d") vector.y -= speed;
-            else vector.z -= speed;
+            else vector.sub(camera_forward);
             direction = "front";
             break;
           case MOVE_LEFT:
-            vector.x += speed;
+            if (movement_plane === "2d") vector.x += speed;
+            else vector.sub(camera_right);
             direction = "left";
             break;
           case MOVE_RIGHT:
-            vector.x -= speed;
+            if (movement_plane === "2d") vector.x -= speed;
+            else vector.add(camera_right);
             direction = "right";
             break;
           default:
